@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "riskpilot"
+version = "0.1.0"
+description = "RiskPilot AI - Credit Risk Decision Intelligence Platform (probabilistic baseline milestone)"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Ricardo" }]
+dependencies = [
+    "pandas>=2.2,<3",
+    "numpy>=1.26,<3",
+    "scikit-learn>=1.5,<2",
+    "matplotlib>=3.8,<4",
+    "joblib>=1.3",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8",
+    "ruff>=0.5",
+    "jupyter",
+    "kaggle>=1.6",
+]
+
+[project.scripts]
+riskpilot-train = "riskpilot.models.train:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra -q"
+filterwarnings = [
+    "error::sklearn.exceptions.ConvergenceWarning",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests"]
+extend-exclude = ["notebooks", ".venv", "data", "artifacts"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "N", "SIM", "PTH"]
+ignore = ["N803", "N806"]  # allow X, X_train naming (scikit-learn convention)
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["B011"]

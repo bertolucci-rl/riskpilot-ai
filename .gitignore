@@ -1,0 +1,72 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+.installed.cfg
+*.egg
+
+# ---- Virtual environments ----
+.venv/
+venv/
+env/
+ENV/
+
+# ---- Secrets / credentials ----
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+kaggle.json
+.kaggle/
+secrets/
+*.secret
+
+# ---- Caches ----
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.cache/
+.hypothesis/
+*.log
+
+# ---- Notebooks ----
+.ipynb_checkpoints/
+
+# ---- IDE / editor ----
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ---- Data (never commit raw Kaggle data or derived datasets) ----
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+*.csv
+*.csv.zip
+*.parquet
+*.feather
+*.zip
+
+# ---- Trained model binaries ----
+artifacts/models/*
+!artifacts/models/.gitkeep
+*.joblib
+*.pkl
+*.pickle
+
+# ---- Generated temporary files ----
+tmp/
+temp/
+*.tmp
