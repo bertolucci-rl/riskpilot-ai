@@ -1,0 +1,348 @@
+{
+  "overview": {
+    "n_rows": 307511,
+    "n_columns": 122,
+    "memory_mb": 529.515493,
+    "n_duplicate_rows": 0,
+    "dtype_counts": {
+      "float64": 65,
+      "int64": 41,
+      "object": 16
+    },
+    "id_column": "SK_ID_CURR",
+    "n_duplicate_ids": 0,
+    "id_is_unique": true
+  },
+  "target": {
+    "n": 307511,
+    "n_missing": 0,
+    "value_counts": {
+      "0": 282686,
+      "1": 24825
+    },
+    "n_positive": 24825,
+    "prevalence": 0.08072881945686496,
+    "imbalance_ratio": 11.387150050352467
+  },
+  "feature_types": {
+    "n_numeric": 104,
+    "n_categorical": 16,
+    "categorical": [
+      "NAME_CONTRACT_TYPE",
+      "CODE_GENDER",
+      "FLAG_OWN_CAR",
+      "FLAG_OWN_REALTY",
+      "NAME_TYPE_SUITE",
+      "NAME_INCOME_TYPE",
+      "NAME_EDUCATION_TYPE",
+      "NAME_FAMILY_STATUS",
+      "NAME_HOUSING_TYPE",
+      "OCCUPATION_TYPE",
+      "WEEKDAY_APPR_PROCESS_START",
+      "ORGANIZATION_TYPE",
+      "FONDKAPREMONT_MODE",
+      "HOUSETYPE_MODE",
+      "WALLSMATERIAL_MODE",
+      "EMERGENCYSTATE_MODE"
+    ]
+  },
+  "missingness": {
+    "n_columns_with_missing": 67,
+    "n_columns_over_50pct_missing": 41,
+    "n_columns_over_20pct_missing": 50,
+    "total_missing_fraction": 0.24395941907129431,
+    "top_missing": {
+      "COMMONAREA_AVG": 0.6987229725115525,
+      "COMMONAREA_MODE": 0.6987229725115525,
+      "COMMONAREA_MEDI": 0.6987229725115525,
+      "NONLIVINGAPARTMENTS_AVG": 0.6943296337366793,
+      "NONLIVINGAPARTMENTS_MODE": 0.6943296337366793,
+      "NONLIVINGAPARTMENTS_MEDI": 0.6943296337366793,
+      "FONDKAPREMONT_MODE": 0.6838617155158677,
+      "LIVINGAPARTMENTS_AVG": 0.6835495315614726,
+      "LIVINGAPARTMENTS_MODE": 0.6835495315614726,
+      "LIVINGAPARTMENTS_MEDI": 0.6835495315614726
+    }
+  },
+  "constant_features": [
+    {
+      "column": "FLAG_MOBIL",
+      "n_unique": 2,
+      "top_value": 1,
+      "top_frac": 0.9999967480838083,
+      "is_constant": false
+    },
+    {
+      "column": "FLAG_DOCUMENT_12",
+      "n_unique": 2,
+      "top_value": 0,
+      "top_frac": 0.9999934961676168,
+      "is_constant": false
+    },
+    {
+      "column": "FLAG_DOCUMENT_10",
+      "n_unique": 2,
+      "top_value": 0,
+      "top_frac": 0.9999772365866587,
+      "is_constant": false
+    },
+    {
+      "column": "FLAG_DOCUMENT_2",
+      "n_unique": 2,
+      "top_value": 0,
+      "top_frac": 0.999957725089509,
+      "is_constant": false
+    },
+    {
+      "column": "FLAG_DOCUMENT_4",
+      "n_unique": 2,
+      "top_value": 0,
+      "top_frac": 0.9999187020952096,
+      "is_constant": false
+    },
+    {
+      "column": "FLAG_DOCUMENT_7",
+      "n_unique": 2,
+      "top_value": 0,
+      "top_frac": 0.9998081369446946,
+      "is_constant": false
+    },
+    {
+      "column": "FLAG_DOCUMENT_17",
+      "n_unique": 2,
+      "top_value": 0,
+      "top_frac": 0.9997333428722875,
+      "is_constant": false
+    },
+    {
+      "column": "FLAG_DOCUMENT_21",
+      "n_unique": 2,
+      "top_value": 0,
+      "top_frac": 0.9996650526322636,
+      "is_constant": false
+    },
+    {
+      "column": "FLAG_DOCUMENT_20",
+      "n_unique": 2,
+      "top_value": 0,
+      "top_frac": 0.9994927010741079,
+      "is_constant": false
+    },
+    {
+      "column": "FLAG_DOCUMENT_19",
+      "n_unique": 2,
+      "top_value": 0,
+      "top_frac": 0.9994048993369343,
+      "is_constant": false
+    },
+    {
+      "column": "FLAG_DOCUMENT_15",
+      "n_unique": 2,
+      "top_value": 0,
+      "top_frac": 0.9987902871767189,
+      "is_constant": false
+    },
+    {
+      "column": "FLAG_CONT_MOBILE",
+      "n_unique": 2,
+      "top_value": 1,
+      "top_frac": 0.9981334001060125,
+      "is_constant": false
+    },
+    {
+      "column": "FLAG_DOCUMENT_14",
+      "n_unique": 2,
+      "top_value": 0,
+      "top_frac": 0.9970635196789709,
+      "is_constant": false
+    },
+    {
+      "column": "FLAG_DOCUMENT_13",
+      "n_unique": 2,
+      "top_value": 0,
+      "top_frac": 0.9964749228482883,
+      "is_constant": false
+    },
+    {
+      "column": "FLAG_DOCUMENT_9",
+      "n_unique": 2,
+      "top_value": 0,
+      "top_frac": 0.9961042044024442,
+      "is_constant": false
+    },
+    {
+      "column": "FLAG_DOCUMENT_11",
+      "n_unique": 2,
+      "top_value": 0,
+      "top_frac": 0.9960879448214861,
+      "is_constant": false
+    },
+    {
+      "column": "FLAG_DOCUMENT_18",
+      "n_unique": 2,
+      "top_value": 0,
+      "top_frac": 0.9918702095209603,
+      "is_constant": false
+    },
+    {
+      "column": "FLAG_DOCUMENT_16",
+      "n_unique": 2,
+      "top_value": 0,
+      "top_frac": 0.9900718998669966,
+      "is_constant": false
+    }
+  ],
+  "high_cardinality_features": [
+    {
+      "column": "ORGANIZATION_TYPE",
+      "n_unique": 58,
+      "frac_missing": 0.0
+    }
+  ],
+  "categorical_cardinality": [
+    {
+      "column": "ORGANIZATION_TYPE",
+      "n_unique": 58,
+      "frac_missing": 0.0
+    },
+    {
+      "column": "OCCUPATION_TYPE",
+      "n_unique": 18,
+      "frac_missing": 0.31345545362604915
+    },
+    {
+      "column": "NAME_INCOME_TYPE",
+      "n_unique": 8,
+      "frac_missing": 0.0
+    },
+    {
+      "column": "NAME_TYPE_SUITE",
+      "n_unique": 7,
+      "frac_missing": 0.004201475719567756
+    },
+    {
+      "column": "WEEKDAY_APPR_PROCESS_START",
+      "n_unique": 7,
+      "frac_missing": 0.0
+    },
+    {
+      "column": "WALLSMATERIAL_MODE",
+      "n_unique": 7,
+      "frac_missing": 0.508407829313423
+    },
+    {
+      "column": "NAME_FAMILY_STATUS",
+      "n_unique": 6,
+      "frac_missing": 0.0
+    },
+    {
+      "column": "NAME_HOUSING_TYPE",
+      "n_unique": 6,
+      "frac_missing": 0.0
+    },
+    {
+      "column": "NAME_EDUCATION_TYPE",
+      "n_unique": 5,
+      "frac_missing": 0.0
+    },
+    {
+      "column": "FONDKAPREMONT_MODE",
+      "n_unique": 4,
+      "frac_missing": 0.6838617155158677
+    },
+    {
+      "column": "CODE_GENDER",
+      "n_unique": 3,
+      "frac_missing": 0.0
+    },
+    {
+      "column": "HOUSETYPE_MODE",
+      "n_unique": 3,
+      "frac_missing": 0.50176091261776
+    },
+    {
+      "column": "NAME_CONTRACT_TYPE",
+      "n_unique": 2,
+      "frac_missing": 0.0
+    },
+    {
+      "column": "FLAG_OWN_CAR",
+      "n_unique": 2,
+      "frac_missing": 0.0
+    },
+    {
+      "column": "FLAG_OWN_REALTY",
+      "n_unique": 2,
+      "frac_missing": 0.0
+    },
+    {
+      "column": "EMERGENCYSTATE_MODE",
+      "n_unique": 2,
+      "frac_missing": 0.47398304450897694
+    }
+  ],
+  "suspicious_values": {
+    "unknown_tokens": {
+      "CODE_GENDER": {
+        "XNA": 4
+      },
+      "NAME_FAMILY_STATUS": {
+        "Unknown": 2
+      },
+      "ORGANIZATION_TYPE": {
+        "XNA": 55374
+      }
+    },
+    "days_columns_positive": {
+      "DAYS_EMPLOYED": {
+        "n_positive": 55374,
+        "frac_positive": 0.18007160719453938,
+        "max": 365243.0
+      }
+    },
+    "sentinels": {
+      "DAYS_EMPLOYED": {
+        "sentinel": 365243.0,
+        "n": 55374,
+        "frac": 0.18007160719453938
+      }
+    },
+    "extreme_numeric": {
+      "AMT_INCOME_TOTAL": {
+        "max": 117000000.0,
+        "q99": 472500.0,
+        "median": 147150.0,
+        "ratio_max_to_q99": 247.61904761904762
+      },
+      "AMT_REQ_CREDIT_BUREAU_QRT": {
+        "max": 261.0,
+        "q99": 2.0,
+        "median": 0.0,
+        "ratio_max_to_q99": 130.5
+      }
+    },
+    "negative_amounts": {}
+  },
+  "leakage": {
+    "name_based_flags": [],
+    "auc_threshold": 0.8,
+    "high_separation_features": {},
+    "top_univariate_auc": {
+      "EXT_SOURCE_3": 0.679399766415495,
+      "EXT_SOURCE_1": 0.665680953698119,
+      "EXT_SOURCE_2": 0.6561201400189125,
+      "DAYS_BIRTH": 0.5830025432408042,
+      "OWN_CAR_AGE": 0.5588841313356966,
+      "DAYS_LAST_PHONE_CHANGE": 0.5568636483115862,
+      "DAYS_ID_PUBLISH": 0.555670029380579,
+      "FLOORSMAX_AVG": 0.5503853670872383,
+      "FLOORSMAX_MEDI": 0.5500268245787314,
+      "REGION_RATING_CLIENT_W_CITY": 0.5491819141025376,
+      "FLOORSMAX_MODE": 0.5490984380574546,
+      "REGION_RATING_CLIENT": 0.5480631983651519,
+      "LIVINGAREA_AVG": 0.5471164927499196,
+      "LIVINGAREA_MEDI": 0.5465611866404307,
+      "TOTALAREA_MODE": 0.5453673378887425
+    }
+  }
+}
