@@ -24,6 +24,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from matplotlib.figure import Figure
+from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import (
     average_precision_score,
     brier_score_loss,
@@ -39,6 +40,7 @@ REFERENCE_COLOR = "#8a8984"  # neutral ink for baselines / diagonals
 GRID_COLOR = "#e5e4e0"
 
 __all__ = [
+    "calibration_slope_intercept",
     "calibration_table",
     "compute_metrics",
     "expected_calibration_error",
@@ -118,10 +120,36 @@ def expected_calibration_error(table: pd.DataFrame) -> float:
     return float((weights * table["gap"].abs()).sum())
 
 
+def calibration_slope_intercept(
+    y_true: Any, y_prob: Any, *, eps: float = 1e-12
+) -> tuple[float | None, float | None]:
+    """Logistic calibration diagnostic (Cox, 1958): fit ``y ~ a + b * logit(p)``.
+
+    ``b = 1`` and ``a = 0`` mean the probabilities are calibrated; ``b < 1``
+    means they are over-confident (too spread out), ``b > 1`` under-confident;
+    ``a`` is a global shift given the slope. The fit is (practically)
+    unpenalized. This is a *diagnostic*: nothing here alters the predictions.
+
+    Returns ``(None, None)`` when the quantity is undefined: a single class,
+    constant predictions, or predictions that separate the classes perfectly
+    (the maximum-likelihood slope is then infinite).
+    """
+    y, p = _as_arrays(y_true, y_prob)
+    p = np.clip(p, eps, 1.0 - eps)
+    logit = np.log(p / (1.0 - p))
+    if y.min() == y.max() or logit.max() == logit.min():
+        return None, None
+    pos, neg = logit[y == 1], logit[y == 0]
+    if pos.min() > neg.max() or pos.max() < neg.min():
+        return None, None
+    fit = LogisticRegression(C=1e6, solver="lbfgs", max_iter=1000).fit(logit.reshape(-1, 1), y)
+    return float(fit.coef_[0, 0]), float(fit.intercept_[0])
+
+
 # --------------------------------------------------------------------------- #
 # Metrics
 # --------------------------------------------------------------------------- #
-def compute_metrics(y_true: Any, y_prob: Any, *, n_bins: int = 10) -> dict[str, float | int]:
+def compute_metrics(y_true: Any, y_prob: Any, *, n_bins: int = 10) -> dict[str, float | int | None]:
     """Ranking, probabilistic and calibration metrics with prevalence references."""
     y, p = _as_arrays(y_true, y_prob)
     prevalence = float(y.mean())
@@ -132,6 +160,7 @@ def compute_metrics(y_true: Any, y_prob: Any, *, n_bins: int = 10) -> dict[str, 
     ll = float(log_loss(y, p, labels=[0, 1]))
     ll_ref = float(log_loss(y, constant, labels=[0, 1]))
     table = calibration_table(y, p, n_bins=n_bins, strategy="quantile")
+    slope, intercept = calibration_slope_intercept(y, p)
 
     return {
         "n": int(y.size),
@@ -146,6 +175,8 @@ def compute_metrics(y_true: Any, y_prob: Any, *, n_bins: int = 10) -> dict[str, 
         "brier_prevalence_baseline": brier_ref,
         "brier_skill_score": 1.0 - brier / brier_ref if brier_ref > 0 else float("nan"),
         "expected_calibration_error": expected_calibration_error(table),
+        "calibration_slope": slope,
+        "calibration_intercept": intercept,
         "mean_predicted_probability": float(p.mean()),
         "median_predicted_probability": float(np.median(p)),
         "max_predicted_probability": float(p.max()),

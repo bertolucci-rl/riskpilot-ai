@@ -34,17 +34,20 @@ Status of this milestone:
 |---|---|
 | Package (`riskpilot`): config, loader, validation, preprocessing, training, evaluation | implemented and unit-tested |
 | Kaggle download helper (`python -m riskpilot.data.download`) | implemented |
-| Baseline metrics, figures, notebooks and technical report | **pending: waiting for the Kaggle dataset** (requires Kaggle authentication and competition-rule acceptance on the developer's machine) |
+| Real-data audit (`notebooks/01_data_understanding.ipynb`, `artifacts/metrics/data_validation.json`) | done, executed on the full table |
+| Baseline run, metrics and figures (`python -m riskpilot.models.train`, `notebooks/02_baseline.ipynb`) | done, lbfgs converged, no warning suppressed |
+| Technical report (`reports/baseline_report.md`) | done |
 
-The metrics section below is populated from `artifacts/metrics/baseline_metrics.json`
-once the baseline has actually been run on the real data. No number in this
-README is typed by hand.
+The numbers in this README are copied from `artifacts/metrics/baseline_metrics.json`
+(run of 2026-09-16, scikit-learn 1.9.1) and from the executed notebooks; the report
+explains every one of them.
 
 ## Dataset
 
 [Home Credit Default Risk](https://www.kaggle.com/competitions/home-credit-default-risk)
 (Kaggle). Milestone 1 uses **only** `application_train.csv` (one row per loan
-application, ~307k rows, 122 columns, binary `TARGET`). The relational tables
+application, 307,511 rows, 122 columns, binary `TARGET` with prevalence 8.07 %).
+The relational tables
 (bureau, previous applications, installments, ...) are reserved for the
 feature-engineering milestone.
 
@@ -94,15 +97,83 @@ are trying to estimate. Convergence is checked and recorded, never suppressed.
 - Ranking: ROC-AUC, average precision (PR-AUC) with the prevalence as reference.
 - Probability quality: log loss and Brier score, each next to the score of a
   constant "predict the prevalence" model; Brier skill score.
-- Calibration: quantile-binned reliability table, expected calibration error,
-  reliability diagram and predicted-probability distribution by class.
+- Calibration: quantile-binned reliability table, expected calibration error, a
+  slope/intercept diagnostic (logistic fit of the outcome on the predicted
+  log-odds; measured, never applied), reliability diagram and
+  predicted-probability distribution by class.
 
 ## Metrics
 
-Not yet available: the experiment has not been run because the dataset could
-not be downloaded without Kaggle credentials. This section will be filled with
-the contents of `artifacts/metrics/baseline_metrics.json` after the first real
-run.
+Test partition: 61,503 applications (4,965 defaults, prevalence 0.0807), never
+touched by any fitting step. "Null model" is the constant prediction of the
+prevalence; for the calibration rows the reference is the ideal value.
+
+| Metric | Test | Train | Null model / ideal |
+|---|---|---|---|
+| ROC-AUC | **0.7504** | 0.7512 | 0.5 |
+| Average precision (PR-AUC) | **0.2353** | 0.2292 | 0.0807 |
+| Log loss | **0.2482** | 0.2484 | 0.2805 |
+| Brier score | **0.0682** | 0.0684 | 0.0742 |
+| Brier skill score | **0.081** | 0.078 | 0 |
+| Expected calibration error (10 quantile bins) | **0.0021** | 0.0010 | 0 |
+| Calibration slope / intercept | **1.006 / 0.015** | 1.001 / 0.002 | 1 / 0 |
+
+Model: `LogisticRegression(solver="lbfgs", C=1.0, max_iter=1000)`, L2 penalty, no
+class weights, 312 transformed features (104 numeric + 62 missing indicators +
+146 one-hot), converged in 123 iterations, fit time about 30 s.
+
+What the numbers say:
+
+- Ranking is moderate (ROC-AUC 0.75, precision about 0.33 at 20 % recall), the
+  expected level for a linear model on the raw application table.
+- The probabilities are calibrated: mean prediction 0.0805 vs observed 0.0807,
+  slope 1.006, every decile gap below one percentage point; the largest gap is a
+  slight under-prediction in the top decile (0.262 predicted vs 0.270 observed,
+  inside its 95 % interval). Only 0.18 % of test applicants are scored above 0.5,
+  so the high-probability tail is not estimable. There is no evidence that would
+  justify recalibrating this model; its limitation is discrimination.
+- Train and test agree to the third decimal: no overfitting.
+
+| ROC curve | Reliability diagram |
+|---|---|
+| ![ROC curve](artifacts/figures/baseline_roc_curve.png) | ![Reliability diagram](artifacts/figures/baseline_calibration_curve.png) |
+
+Also generated: `artifacts/figures/baseline_precision_recall_curve.png` and
+`artifacts/figures/baseline_probability_distribution.png`.
+
+## What the real data showed
+
+Verified in `notebooks/01_data_understanding.ipynb` against the assumptions the
+package was written with (numbers and details in `reports/baseline_report.md`):
+
+- 307,511 × 122, no duplicate rows or ids; `SK_ID_CURR` carries no signal
+  (univariate AUC 0.498) and is dropped.
+- 67 columns have gaps, 41 more than half. The missingness is structural (the
+  building-description block, `OWN_CAR_AGE` when there is no car, `EXT_SOURCE_1`),
+  so the missing indicators are features and nothing is dropped.
+- `DAYS_EMPLOYED == 365243` on 18.0 % of rows is exactly the pensioners and the
+  unemployed (and exactly the `ORGANIZATION_TYPE == "XNA"` rows), and the only
+  positive value in any `DAYS_*` column: a documented convention, mapped to
+  missing plus an indicator, not corruption.
+- `XNA` in `ORGANIZATION_TYPE` is a real level; `CODE_GENDER == "XNA"` (4 rows)
+  and `NAME_FAMILY_STATUS == "Unknown"` (2 rows) are negligible defects kept as
+  rare one-hot levels.
+- Highest cardinality is 58 levels; the one-hot block has 146 columns. The design
+  matrix ends up dense (614 MB for the training split) because the numeric block
+  dominates, which is acceptable and is what the fit time reflects.
+- No leakage candidate: the strongest single features are the external scores
+  `EXT_SOURCE_3/1/2` (univariate AUC 0.66–0.68), legitimate at application time.
+- One applicant reports an income of 117,000,000, which inflates the standard
+  deviation of `AMT_INCOME_TOTAL` 2.4×; 18 standardized columns (near-constant
+  flags, rare missing indicators, heavy-tailed counts) contain a training row at
+  |z| > 50, three of them near 500. The fitted coefficients on those
+  columns are a few thousandths, so no other applicant's score is distorted, but
+  income is effectively unused. Left unchanged for the baseline and recorded as a
+  candidate revision to be compared on the same split in the next milestone.
+- Two runtime warnings appeared on the first real run and were fixed in code
+  rather than silenced: the package `__init__` double-imported the CLI module,
+  and the metrics file recorded the penalty as `"deprecated"` (scikit-learn 1.8+);
+  the model is L2 and is now recorded by name. No `ConvergenceWarning` occurred.
 
 ## Architecture
 
@@ -111,7 +182,7 @@ riskpilot-ai/
 ├── data/
 │   ├── raw/                  # application_train.csv (git-ignored)
 │   └── processed/            # split membership etc. (git-ignored)
-├── notebooks/                # 01_data_understanding, 02_baseline (added with the first run)
+├── notebooks/                # 01_data_understanding, 02_baseline (executed, outputs kept)
 ├── src/riskpilot/
 │   ├── config.py             # pathlib-based paths, RANDOM_STATE, column names, sentinels
 │   ├── data/
@@ -126,9 +197,9 @@ riskpilot-ai/
 ├── tests/                    # pytest suite on small synthetic fixtures
 ├── artifacts/
 │   ├── figures/              # ROC, PR, reliability, probability distribution (PNG)
-│   ├── metrics/              # baseline_metrics.json
+│   ├── metrics/              # baseline_metrics.json, data_validation.json
 │   └── models/               # baseline pipeline (joblib, git-ignored)
-├── reports/                  # baseline_report.md
+├── reports/                  # baseline_report.md (technical report of Milestone 1)
 ├── pyproject.toml
 └── README.md
 ```
@@ -148,8 +219,12 @@ pip install -e ".[dev]"
 kaggle auth login
 python -m riskpilot.data.download
 
-# Train + evaluate the baseline, write metrics/figures/model
+# Train + evaluate the baseline, write metrics/figures/model (about 50 s)
 python -m riskpilot.models.train
+
+# Notebooks, executed in place: 01 audits the data, 02 re-runs and analyses the baseline
+jupyter nbconvert --to notebook --execute --inplace notebooks/01_data_understanding.ipynb
+jupyter nbconvert --to notebook --execute --inplace notebooks/02_baseline.ipynb
 
 # Quality checks
 pytest

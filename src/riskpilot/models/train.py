@@ -29,6 +29,7 @@ import numpy as np
 import pandas as pd
 import sklearn
 from sklearn.exceptions import ConvergenceWarning
+from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 
@@ -45,6 +46,19 @@ from riskpilot.models.evaluate import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+def _display_path(path: str | Path) -> str:
+    """Portable string for a path: relative to the project root when inside it.
+
+    Keeps user-specific absolute paths out of the committed metrics file and out
+    of notebook outputs; paths outside the project stay absolute.
+    """
+    p = Path(path)
+    try:
+        return p.resolve().relative_to(config.PROJECT_ROOT).as_posix()
+    except ValueError:
+        return p.as_posix()
 
 
 @dataclass
@@ -72,7 +86,7 @@ class BaselineConfig:
         out = asdict(self)
         for key, value in out.items():
             if isinstance(value, Path):
-                out[key] = value.as_posix()
+                out[key] = _display_path(value)
         return out
 
 
@@ -115,6 +129,26 @@ def _fit_with_convergence_check(pipeline: Pipeline, X: pd.DataFrame, y: pd.Serie
             pipeline["model"].max_iter,
         )
     return warned
+
+
+def _penalty_name(model: LogisticRegression) -> str:
+    """Name of the penalty actually applied, independent of the scikit-learn version.
+
+    scikit-learn 1.8 deprecated ``LogisticRegression(penalty=...)`` in favour of
+    ``l1_ratio`` (0 = L2, 1 = L1, in between = elastic net) and ``C=inf`` for no
+    penalty; the ``penalty`` attribute then holds the placeholder ``"deprecated"``.
+    """
+    penalty = getattr(model, "penalty", "deprecated")
+    if penalty != "deprecated":
+        return "none" if penalty is None else str(penalty)
+    if np.isinf(model.C):
+        return "none"
+    l1_ratio = model.l1_ratio or 0.0
+    if l1_ratio == 0.0:
+        return "l2"
+    if l1_ratio == 1.0:
+        return "l1"
+    return "elasticnet"
 
 
 def run_baseline(cfg: BaselineConfig | None = None) -> BaselineResult:
@@ -183,7 +217,7 @@ def run_baseline(cfg: BaselineConfig | None = None) -> BaselineResult:
         cfg.models_dir.mkdir(parents=True, exist_ok=True)
         model_path = cfg.models_dir / f"{cfg.prefix}_logistic_regression.joblib"
         joblib.dump(pipeline, model_path)
-        logger.info("Saved fitted pipeline to %s", model_path)
+        logger.info("Saved fitted pipeline to %s", _display_path(model_path))
 
     split_path: Path | None = None
     if cfg.save_split:
@@ -204,7 +238,7 @@ def run_baseline(cfg: BaselineConfig | None = None) -> BaselineResult:
         },
         "config": cfg.to_dict(),
         "data": {
-            "path": Path(cfg.data_path).as_posix(),
+            "path": _display_path(cfg.data_path),
             "n_rows": int(len(y)),
             "n_raw_features": int(X.shape[1]),
             "n_numeric_features": len(feature_types.numeric),
@@ -219,12 +253,12 @@ def run_baseline(cfg: BaselineConfig | None = None) -> BaselineResult:
             "n_test": int(len(y_test)),
             "prevalence_train": float(y_train.mean()),
             "prevalence_test": float(y_test.mean()),
-            "membership_file": split_path.as_posix() if split_path else None,
+            "membership_file": _display_path(split_path) if split_path else None,
         },
         "model": {
             "estimator": "LogisticRegression",
             "solver": model.solver,
-            "penalty": model.penalty,
+            "penalty": _penalty_name(model),
             "C": model.C,
             "class_weight": model.class_weight,
             "max_iter": model.max_iter,
@@ -237,12 +271,12 @@ def run_baseline(cfg: BaselineConfig | None = None) -> BaselineResult:
         "metrics": {"test": metrics_test, "train": metrics_train},
         "calibration_table_test": table.to_dict(orient="records"),
         "artifacts": {
-            "figures": {k: v.as_posix() for k, v in figures.items()},
-            "model": model_path.as_posix() if model_path else None,
+            "figures": {k: _display_path(v) for k, v in figures.items()},
+            "model": _display_path(model_path) if model_path else None,
         },
     }
     metrics_path = save_metrics(payload, cfg.metrics_dir / f"{cfg.prefix}_metrics.json")
-    logger.info("Saved metrics to %s", metrics_path)
+    logger.info("Saved metrics to %s", _display_path(metrics_path))
 
     return BaselineResult(
         pipeline=pipeline,

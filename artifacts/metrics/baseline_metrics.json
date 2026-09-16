@@ -1,0 +1,201 @@
+{
+  "run": {
+    "timestamp_utc": "2026-09-16T21:57:56+00:00",
+    "riskpilot_version": "0.1.0",
+    "python_version": "3.12.5",
+    "sklearn_version": "1.9.1",
+    "total_seconds": 44.1
+  },
+  "config": {
+    "data_path": "data/raw/application_train.csv",
+    "nrows": null,
+    "test_size": 0.2,
+    "random_state": 42,
+    "C": 1.0,
+    "max_iter": 1000,
+    "class_weight": null,
+    "n_calibration_bins": 10,
+    "prefix": "baseline",
+    "figures_dir": "artifacts/figures",
+    "metrics_dir": "artifacts/metrics",
+    "models_dir": "artifacts/models",
+    "processed_dir": "data/processed",
+    "save_model": true,
+    "save_split": true,
+    "sentinels": {
+      "DAYS_EMPLOYED": 365243.0
+    }
+  },
+  "data": {
+    "path": "data/raw/application_train.csv",
+    "n_rows": 307511,
+    "n_raw_features": 120,
+    "n_numeric_features": 104,
+    "n_categorical_features": 16,
+    "n_transformed_features": 312
+  },
+  "split": {
+    "strategy": "stratified_random_holdout",
+    "test_size": 0.2,
+    "random_state": 42,
+    "n_train": 246008,
+    "n_test": 61503,
+    "prevalence_train": 0.08072908198107379,
+    "prevalence_test": 0.08072776937710356,
+    "membership_file": "data/processed/baseline_split_membership.csv"
+  },
+  "model": {
+    "estimator": "LogisticRegression",
+    "solver": "lbfgs",
+    "penalty": "l2",
+    "C": 1.0,
+    "class_weight": null,
+    "max_iter": 1000,
+    "n_iter": 123,
+    "converged": true,
+    "fit_seconds": 32.1,
+    "intercept": -0.5736080996066761,
+    "n_coefficients": 312
+  },
+  "metrics": {
+    "test": {
+      "n": 61503,
+      "n_positive": 4965,
+      "prevalence": 0.08072776937710356,
+      "roc_auc": 0.7504123473248321,
+      "average_precision": 0.23531823859611234,
+      "average_precision_prevalence_baseline": 0.08072776937710356,
+      "log_loss": 0.24820499894091355,
+      "log_loss_prevalence_baseline": 0.2805432489119303,
+      "brier_score": 0.06821592765037675,
+      "brier_prevalence_baseline": 0.07421079662850075,
+      "brier_skill_score": 0.08078162815222578,
+      "expected_calibration_error": 0.0020904663524621797,
+      "calibration_slope": 1.0055614798543704,
+      "calibration_intercept": 0.014821161387732925,
+      "mean_predicted_probability": 0.08050885907953925,
+      "median_predicted_probability": 0.055405548126375444,
+      "max_predicted_probability": 0.7443492163670583
+    },
+    "train": {
+      "n": 246008,
+      "n_positive": 19860,
+      "prevalence": 0.08072908198107379,
+      "roc_auc": 0.7512281138833393,
+      "average_precision": 0.2291985089222309,
+      "average_precision_prevalence_baseline": 0.08072908198107379,
+      "log_loss": 0.24840730448895468,
+      "log_loss_prevalence_baseline": 0.2805464418090607,
+      "brier_score": 0.06839652412577721,
+      "brier_prevalence_baseline": 0.07421189730356688,
+      "brier_skill_score": 0.07836173698674809,
+      "expected_calibration_error": 0.0010481678632516475,
+      "calibration_slope": 1.001056442185789,
+      "calibration_intercept": 0.0022037784680965034,
+      "mean_predicted_probability": 0.08072593078032331,
+      "median_predicted_probability": 0.05563545896737984,
+      "max_predicted_probability": 0.9532395595072535
+    }
+  },
+  "calibration_table_test": [
+    {
+      "bin": 0,
+      "lower": 5.071417965292911e-09,
+      "upper": 0.017125961276740112,
+      "n": 6151,
+      "mean_predicted": 0.01187768089510041,
+      "observed_rate": 0.01495691757437815,
+      "gap": 0.003079236679277739
+    },
+    {
+      "bin": 1,
+      "lower": 0.017125961276740112,
+      "upper": 0.025570256543717654,
+      "n": 6150,
+      "mean_predicted": 0.02139583014244156,
+      "observed_rate": 0.021463414634146343,
+      "gap": 6.758449170478353e-05
+    },
+    {
+      "bin": 2,
+      "lower": 0.025570256543717654,
+      "upper": 0.03429105502848926,
+      "n": 6150,
+      "mean_predicted": 0.029882169116961437,
+      "observed_rate": 0.02910569105691057,
+      "gap": -0.0007764780600508676
+    },
+    {
+      "bin": 3,
+      "lower": 0.03429105502848926,
+      "upper": 0.04392226214017987,
+      "n": 6150,
+      "mean_predicted": 0.03897560166221377,
+      "observed_rate": 0.03577235772357724,
+      "gap": -0.003203243938636531
+    },
+    {
+      "bin": 4,
+      "lower": 0.04392226214017987,
+      "upper": 0.055405548126375444,
+      "n": 6150,
+      "mean_predicted": 0.04948182042702371,
+      "observed_rate": 0.049105691056910566,
+      "gap": -0.00037612937011314435
+    },
+    {
+      "bin": 5,
+      "lower": 0.055405548126375444,
+      "upper": 0.07021544445687856,
+      "n": 6151,
+      "mean_predicted": 0.06236428102536547,
+      "observed_rate": 0.06129084701674525,
+      "gap": -0.0010734340086202207
+    },
+    {
+      "bin": 6,
+      "lower": 0.07021544445687856,
+      "upper": 0.0901689809174973,
+      "n": 6150,
+      "mean_predicted": 0.07966670955285039,
+      "observed_rate": 0.08,
+      "gap": 0.000333290447149609
+    },
+    {
+      "bin": 7,
+      "lower": 0.0901689809174973,
+      "upper": 0.12063783522528446,
+      "n": 6150,
+      "mean_predicted": 0.10422235964830134,
+      "observed_rate": 0.10325203252032521,
+      "gap": -0.0009703271279761366
+    },
+    {
+      "bin": 8,
+      "lower": 0.12063783522528446,
+      "upper": 0.17689261786424196,
+      "n": 6150,
+      "mean_predicted": 0.14490966921625886,
+      "observed_rate": 0.1419512195121951,
+      "gap": -0.0029584497040637536
+    },
+    {
+      "bin": 9,
+      "lower": 0.17689261786424196,
+      "upper": 0.7443492163670583,
+      "n": 6151,
+      "mean_predicted": 0.26229701993739263,
+      "observed_rate": 0.27036254267598764,
+      "gap": 0.00806552273859501
+    }
+  ],
+  "artifacts": {
+    "figures": {
+      "roc_curve": "artifacts/figures/baseline_roc_curve.png",
+      "precision_recall_curve": "artifacts/figures/baseline_precision_recall_curve.png",
+      "calibration_curve": "artifacts/figures/baseline_calibration_curve.png",
+      "probability_distribution": "artifacts/figures/baseline_probability_distribution.png"
+    },
+    "model": "artifacts/models/baseline_logistic_regression.joblib"
+  }
+}

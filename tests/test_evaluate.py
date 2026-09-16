@@ -36,6 +36,35 @@ def test_metrics_are_json_serializable():
     json.dumps(ev.compute_metrics(y, p, n_bins=4))
 
 
+def test_calibration_slope_intercept_recovers_calibrated_and_overconfident():
+    rng = np.random.default_rng(4)
+    logit = rng.normal(-2.5, 1.0, size=50_000)
+    p = 1 / (1 + np.exp(-logit))
+    y = (rng.uniform(size=p.size) < p).astype(int)  # outcomes drawn from p: calibrated
+    slope, intercept = ev.calibration_slope_intercept(y, p)
+    assert slope == pytest.approx(1.0, abs=0.06)
+    assert intercept == pytest.approx(0.0, abs=0.12)
+    # Stretching the log-odds by 2 makes the probabilities over-confident: slope ~ 0.5.
+    p_over = 1 / (1 + np.exp(-2 * logit))
+    slope_over, _ = ev.calibration_slope_intercept(y, p_over)
+    assert slope_over == pytest.approx(0.5, abs=0.04)
+    m = ev.compute_metrics(y, p)
+    assert m["calibration_slope"] == pytest.approx(slope)
+    assert m["calibration_intercept"] == pytest.approx(intercept)
+
+
+@pytest.mark.parametrize(
+    "y, p",
+    [
+        ([0, 0, 1, 1], [0.1, 0.2, 0.8, 0.9]),  # perfectly separable: the ML slope is infinite
+        ([0, 1, 0, 1], [0.3, 0.3, 0.3, 0.3]),  # constant predictions
+        ([1, 1, 1, 1], [0.2, 0.4, 0.6, 0.8]),  # single class
+    ],
+)
+def test_calibration_slope_intercept_undefined_cases(y, p):
+    assert ev.calibration_slope_intercept(np.array(y), np.array(p)) == (None, None)
+
+
 @pytest.mark.parametrize(
     "y, p",
     [

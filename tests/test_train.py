@@ -1,4 +1,6 @@
 import json
+import subprocess
+import sys
 from pathlib import Path
 
 import joblib
@@ -8,7 +10,7 @@ import pytest
 
 from riskpilot import config
 from riskpilot.data.load import split_features_target
-from riskpilot.models.train import BaselineConfig, main, make_split, run_baseline
+from riskpilot.models.train import BaselineConfig, _display_path, main, make_split, run_baseline
 
 
 def test_make_split_is_stratified_and_disjoint(synthetic_df):
@@ -20,6 +22,12 @@ def test_make_split_is_stratified_and_disjoint(synthetic_df):
     # Deterministic under a fixed seed.
     _, X_test_again, _, _ = make_split(X, y, test_size=0.25, random_state=42)
     assert list(X_test.index) == list(X_test_again.index)
+
+
+def test_display_path_is_relative_inside_the_project(tmp_path):
+    assert _display_path(config.FIGURES_DIR / "x.png") == "artifacts/figures/x.png"
+    outside = tmp_path / "y.png"
+    assert _display_path(outside) == outside.as_posix()
 
 
 def _config(synthetic_csv: Path, tmp_path: Path, **overrides) -> BaselineConfig:
@@ -41,6 +49,8 @@ def test_run_baseline_end_to_end(synthetic_csv, tmp_path):
 
     payload = result.payload
     assert payload["model"]["converged"] is True
+    # Recorded by name, not via the attribute scikit-learn 1.8 turned into "deprecated".
+    assert payload["model"]["penalty"] == "l2"
     assert payload["split"]["n_train"] + payload["split"]["n_test"] == payload["data"]["n_rows"]
     test_metrics = payload["metrics"]["test"]
     assert 0.0 <= test_metrics["roc_auc"] <= 1.0
@@ -106,3 +116,20 @@ def test_cli_smoke(synthetic_csv, tmp_path, capsys):
 def test_cli_missing_data_returns_error_code(tmp_path):
     exit_code = main(["--data-path", str(tmp_path / "missing.csv"), "--metrics-dir", str(tmp_path)])
     assert exit_code == 2
+
+
+def test_module_entry_point_does_not_double_import():
+    """``python -m riskpilot.models.train`` must not trigger runpy's double-import warning.
+
+    That warning appears when the package ``__init__`` imports the module being
+    executed with ``-m``; with ``-W error`` it would abort the run.
+    """
+    proc = subprocess.run(
+        [sys.executable, "-W", "error::RuntimeWarning", "-m", "riskpilot.models.train", "--help"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert proc.returncode == 0, proc.stderr
+    assert "found in sys.modules" not in proc.stderr
+    assert "usage:" in proc.stdout
