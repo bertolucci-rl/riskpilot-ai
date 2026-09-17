@@ -70,3 +70,6 @@ artifacts/models/*
 tmp/
 temp/
 *.tmp
+
+# ---- Machine-readable experiment records (small, intended for Git) ----
+!artifacts/metrics/*.csv

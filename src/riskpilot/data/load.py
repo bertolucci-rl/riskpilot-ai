@@ -78,6 +78,24 @@ def load_application_train(
     return df
 
 
+def categorize_strings(df: pd.DataFrame) -> pd.DataFrame:
+    """Return ``df`` with object (string) columns stored as ``pandas.Categorical``.
+
+    Pure memory measure: the 16 string columns of ``application_train`` hold
+    about 330 MB as Python objects and about 5 MB as categoricals, which halves
+    the in-memory table. Values are unchanged, missing stays missing, and every
+    downstream step (the linear pipeline's imputer + one-hot encoder, the tree
+    preprocessor) treats a categorical column exactly like a string column; the
+    challenger experiment verifies this by reproducing the recorded baseline
+    metrics from the persisted pipeline.
+    """
+    out = df.copy(deep=False)
+    string_cols = out.select_dtypes(include=["object", "string"]).columns
+    for col in string_cols:
+        out[col] = out[col].astype("category")
+    return out
+
+
 def split_features_target(
     df: pd.DataFrame,
     *,
