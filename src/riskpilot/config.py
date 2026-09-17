@@ -27,6 +27,12 @@ APPLICATION_TRAIN_PATH: Path = RAW_DATA_DIR / APPLICATION_TRAIN_FILENAME
 
 RANDOM_STATE: int = 42
 TEST_SIZE: float = 0.2
+# Share of the frozen training portion held out for model selection / early
+# stopping of the challengers (Milestone 2). The frozen test split is never used.
+VALIDATION_SIZE: float = 0.2
+# Threads for the gradient-boosting libraries: the physical core count of the
+# development machine. Recorded in every metrics file; override with --n-jobs.
+N_JOBS: int = 6
 
 TARGET_COL: str = "TARGET"
 ID_COL: str = "SK_ID_CURR"

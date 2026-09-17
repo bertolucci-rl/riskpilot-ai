@@ -1,0 +1,249 @@
+{
+  "run": {
+    "timestamp_utc": "2026-09-17T00:22:30+00:00",
+    "riskpilot_version": "0.1.0",
+    "python_version": "3.12.5",
+    "sklearn_version": "1.9.1",
+    "lightgbm_version": "4.7.0",
+    "xgboost_version": "3.4.1",
+    "total_seconds": 88.5
+  },
+  "library": "xgboost",
+  "label": "XGBoost",
+  "spec": {
+    "library": "xgboost",
+    "params": {
+      "objective": "binary:logistic",
+      "eval_metric": "logloss",
+      "tree_method": "hist",
+      "learning_rate": 0.05,
+      "n_estimators": 1140,
+      "max_depth": 3,
+      "min_child_weight": 1,
+      "subsample": 0.8,
+      "colsample_bytree": 0.3,
+      "reg_alpha": 1.0,
+      "reg_lambda": 10.0,
+      "enable_categorical": true,
+      "random_state": 42,
+      "n_jobs": 6,
+      "verbosity": 1
+    },
+    "heavy_tail": "none",
+    "missing_indicators": "none"
+  },
+  "selection": {
+    "selected_trial": "xgboost-11",
+    "validation_metrics": {
+      "roc_auc": 0.7562227294577407,
+      "average_precision": 0.23822600195389895,
+      "log_loss": 0.2468889359941753,
+      "brier_score": 0.06806285397157934,
+      "brier_skill_score": 0.08285111700721759,
+      "expected_calibration_error": 0.002919778591030794,
+      "calibration_slope": 0.9745150141412307,
+      "calibration_intercept": -0.04747139082294566,
+      "mean_predicted_probability": 0.08032474929609962
+    },
+    "locked_n_estimators": 1140,
+    "selection_file": "artifacts/metrics/challenger_selection.json"
+  },
+  "data": {
+    "path": "data/raw/application_train.csv",
+    "n_rows": 307511,
+    "n_raw_features": 120,
+    "preprocessing": {
+      "n_numeric": 104,
+      "n_categorical": 16,
+      "n_indicators": 0,
+      "n_features_out": 120,
+      "categorical_cardinality": {
+        "NAME_CONTRACT_TYPE": 2,
+        "CODE_GENDER": 3,
+        "FLAG_OWN_CAR": 2,
+        "FLAG_OWN_REALTY": 2,
+        "NAME_TYPE_SUITE": 7,
+        "NAME_INCOME_TYPE": 8,
+        "NAME_EDUCATION_TYPE": 5,
+        "NAME_FAMILY_STATUS": 6,
+        "NAME_HOUSING_TYPE": 6,
+        "OCCUPATION_TYPE": 18,
+        "WEEKDAY_APPR_PROCESS_START": 7,
+        "ORGANIZATION_TYPE": 58,
+        "FONDKAPREMONT_MODE": 4,
+        "HOUSETYPE_MODE": 3,
+        "WALLSMATERIAL_MODE": 7,
+        "EMERGENCYSTATE_MODE": 2
+      },
+      "heavy_tail": "none",
+      "heavy_tail_columns": [],
+      "clip_bounds": {},
+      "missing_indicators": "none",
+      "indicator_groups": [],
+      "float_dtype": "float32"
+    }
+  },
+  "split": {
+    "strategy": "frozen Milestone 1 stratified holdout, reloaded from the membership file",
+    "membership_file": "C:/Users/ricar/riskpilot-ai/data/processed/baseline_split_membership.csv",
+    "verified_against_reseeded_split": true,
+    "n_train": 246008,
+    "n_test": 61503,
+    "n_test_positive": 4965,
+    "prevalence_train": 0.08072908198107379,
+    "prevalence_test": 0.08072776937710356
+  },
+  "model": {
+    "estimator": "XGBClassifier",
+    "library_version": "3.4.1",
+    "n_trees": 1140,
+    "early_stopping": "none (rounds locked during selection)",
+    "fit_seconds": 35.44,
+    "predict_seconds_test": 0.844,
+    "n_features": 120,
+    "model_size_mb": 1.515,
+    "class_weight": null,
+    "n_jobs": 6
+  },
+  "metrics": {
+    "test": {
+      "n": 61503,
+      "n_positive": 4965,
+      "prevalence": 0.08072776937710356,
+      "roc_auc": 0.7617169437895897,
+      "average_precision": 0.2521844255254825,
+      "average_precision_prevalence_baseline": 0.08072776937710356,
+      "log_loss": 0.24470834817040527,
+      "log_loss_prevalence_baseline": 0.2805432489119303,
+      "brier_score": 0.06742854879945971,
+      "brier_prevalence_baseline": 0.07421079662850075,
+      "brier_skill_score": 0.09139165912735003,
+      "expected_calibration_error": 0.002290597475804918,
+      "calibration_slope": 1.0179677302318089,
+      "calibration_intercept": 0.04194791775917785,
+      "mean_predicted_probability": 0.08042695172223023,
+      "median_predicted_probability": 0.05307891219854355,
+      "max_predicted_probability": 0.8020240068435669
+    },
+    "train": {
+      "n": 246008,
+      "n_positive": 19860,
+      "prevalence": 0.08072908198107379,
+      "roc_auc": 0.7884903552897949,
+      "average_precision": 0.2834129472471455,
+      "average_precision_prevalence_baseline": 0.08072908198107379,
+      "log_loss": 0.23716542261412685,
+      "log_loss_prevalence_baseline": 0.2805464418090607,
+      "brier_score": 0.06593445690258946,
+      "brier_prevalence_baseline": 0.07421189730356685,
+      "brier_skill_score": 0.1115379164491399,
+      "expected_calibration_error": 0.007583799623331623,
+      "calibration_slope": 1.1455120256716977,
+      "calibration_intercept": 0.29926440087479017,
+      "mean_predicted_probability": 0.08066603435413872,
+      "median_predicted_probability": 0.05303412117063999,
+      "max_predicted_probability": 0.8009878993034363
+    }
+  },
+  "calibration_table_test": [
+    {
+      "bin": 0,
+      "lower": 0.001907356083393097,
+      "upper": 0.017254495248198512,
+      "n": 6151,
+      "mean_predicted": 0.01239738415992861,
+      "observed_rate": 0.012518289708990408,
+      "gap": 0.00012090554906179878
+    },
+    {
+      "bin": 1,
+      "lower": 0.017254495248198512,
+      "upper": 0.02494338415563107,
+      "n": 6150,
+      "mean_predicted": 0.021141263548496776,
+      "observed_rate": 0.018048780487804877,
+      "gap": -0.0030924830606918995
+    },
+    {
+      "bin": 2,
+      "lower": 0.02494338415563107,
+      "upper": 0.03280362039804459,
+      "n": 6150,
+      "mean_predicted": 0.028817747860420042,
+      "observed_rate": 0.03121951219512195,
+      "gap": 0.0024017643347019092
+    },
+    {
+      "bin": 3,
+      "lower": 0.03280362039804459,
+      "upper": 0.04193831831216813,
+      "n": 6150,
+      "mean_predicted": 0.037292106298775204,
+      "observed_rate": 0.03349593495934959,
+      "gap": -0.0037961713394256136
+    },
+    {
+      "bin": 4,
+      "lower": 0.04193831831216813,
+      "upper": 0.05307891219854355,
+      "n": 6150,
+      "mean_predicted": 0.04728837229311466,
+      "observed_rate": 0.044227642276422764,
+      "gap": -0.0030607300166918955
+    },
+    {
+      "bin": 5,
+      "lower": 0.05307891219854355,
+      "upper": 0.06725679337978364,
+      "n": 6151,
+      "mean_predicted": 0.059763932639681175,
+      "observed_rate": 0.0598276702975126,
+      "gap": 6.373765783142249e-05
+    },
+    {
+      "bin": 6,
+      "lower": 0.06725679337978364,
+      "upper": 0.08683226257562637,
+      "n": 6150,
+      "mean_predicted": 0.07652151442155605,
+      "observed_rate": 0.08,
+      "gap": 0.003478485578443949
+    },
+    {
+      "bin": 7,
+      "lower": 0.08683226257562637,
+      "upper": 0.11816055476665499,
+      "n": 6150,
+      "mean_predicted": 0.10123378601864101,
+      "observed_rate": 0.1024390243902439,
+      "gap": 0.0012052383716028847
+    },
+    {
+      "bin": 8,
+      "lower": 0.11816055476665499,
+      "upper": 0.1784836202859879,
+      "n": 6150,
+      "mean_predicted": 0.14389250562079553,
+      "observed_rate": 0.14715447154471545,
+      "gap": 0.0032619659239199184
+    },
+    {
+      "bin": 9,
+      "lower": 0.1784836202859879,
+      "upper": 0.8020240068435669,
+      "n": 6151,
+      "mean_predicted": 0.275903541108415,
+      "observed_rate": 0.2783287270362543,
+      "gap": 0.0024251859278393018
+    }
+  ],
+  "artifacts": {
+    "figures": {
+      "roc_curve": "artifacts/figures/xgboost_roc_curve.png",
+      "precision_recall_curve": "artifacts/figures/xgboost_precision_recall_curve.png",
+      "calibration_curve": "artifacts/figures/xgboost_calibration_curve.png",
+      "probability_distribution": "artifacts/figures/xgboost_probability_distribution.png"
+    },
+    "model": "artifacts/models/xgboost_challenger.joblib"
+  }
+}

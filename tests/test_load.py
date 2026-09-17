@@ -3,7 +3,11 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from riskpilot.data.load import load_application_train, split_features_target
+from riskpilot.data.load import (
+    categorize_strings,
+    load_application_train,
+    split_features_target,
+)
 
 
 def test_missing_file_raises_informative_error(tmp_path: Path):
@@ -56,3 +60,19 @@ def test_split_features_target_does_not_mutate(synthetic_df: pd.DataFrame):
 def test_split_features_target_requires_target(synthetic_df: pd.DataFrame):
     with pytest.raises(KeyError):
         split_features_target(synthetic_df.drop(columns=["TARGET"]))
+
+
+def test_categorize_strings_preserves_values_and_shrinks_memory(synthetic_df: pd.DataFrame):
+    out = categorize_strings(synthetic_df)
+    string_cols = list(synthetic_df.select_dtypes(include=["object"]).columns)
+    assert string_cols and all(isinstance(out[c].dtype, pd.CategoricalDtype) for c in string_cols)
+    for col in string_cols:
+        assert out[col].isna().sum() == synthetic_df[col].isna().sum()
+        assert out[col].astype(object).where(out[col].notna(), None).tolist() == [
+            v if v is not None and v == v else None for v in synthetic_df[col].tolist()
+        ]
+    assert out.memory_usage(deep=True).sum() < synthetic_df.memory_usage(deep=True).sum()
+    assert synthetic_df["CODE_GENDER"].dtype == object  # input not mutated
+    pd.testing.assert_frame_equal(
+        out.drop(columns=string_cols), synthetic_df.drop(columns=string_cols)
+    )
