@@ -65,6 +65,7 @@ __all__ = [
     "comparison_table",
     "load_baseline_reference",
     "load_frozen_split",
+    "load_model_reference",
     "make_comparison_figures",
     "paired_bootstrap",
     "plot_calibration_comparison",
@@ -79,11 +80,13 @@ SERIES_COLORS: dict[str, str] = {
     "logistic_regression": MODEL_COLOR,  # blue
     "lightgbm": SECOND_COLOR,  # orange
     "xgboost": "#1baf7a",  # aqua
+    "lightgbm_relational": "#1baf7a",  # aqua (never drawn together with xgboost)
 }
 LABELS: dict[str, str] = {
     "logistic_regression": "Logistic Regression",
     "lightgbm": "LightGBM",
     "xgboost": "XGBoost",
+    "lightgbm_relational": "LightGBM + history",
 }
 BOOTSTRAP_METRICS: tuple[str, ...] = ("roc_auc", "average_precision", "log_loss", "brier_score")
 HIGHER_IS_BETTER: dict[str, bool] = {
@@ -309,6 +312,69 @@ def load_baseline_reference(
         "model_size_mb": round(model_path.stat().st_size / 1e6, 3) if reloaded else None,
         "metrics_test": m_test,
         "metrics_train": m_train,
+    }
+    return BaselineReference(y_prob_test=p_test, summary=summary, integrity=integrity)
+
+
+def load_model_reference(
+    split: FrozenSplit,
+    *,
+    model_path: str | Path,
+    metrics_path: str | Path,
+    label: str,
+    n_bins: int = 10,
+    atol: float = 1e-6,
+) -> BaselineReference:
+    """Score the frozen test split with a persisted pipeline and check it against its metrics file.
+
+    Generic counterpart of :func:`load_baseline_reference` for any persisted
+    pipeline (e.g. the Milestone 2 challengers); there is no refit fallback,
+    a missing model is an error.
+    """
+    model_path, metrics_path = Path(model_path), Path(metrics_path)
+    if not model_path.is_file():
+        raise FileNotFoundError(f"Persisted model not found: {model_path}")
+    if not metrics_path.is_file():
+        raise FileNotFoundError(f"Recorded metrics not found: {metrics_path}")
+    recorded = json.loads(metrics_path.read_text(encoding="utf-8"))
+    pipeline = joblib.load(model_path)
+    t0 = time.perf_counter()
+    p_test = pipeline.predict_proba(split.X_test)[:, 1]
+    predict_seconds = time.perf_counter() - t0
+    m_test = compute_metrics(split.y_test, p_test, n_bins=n_bins)
+    rec_test = recorded["metrics"]["test"]
+    checks = {
+        k: abs(m_test[k] - rec_test[k])
+        for k in ("roc_auc", "average_precision", "log_loss", "brier_score")
+    }
+    integrity = {
+        "model_reloaded_from_disk": True,
+        "model_path": model_path.as_posix(),
+        "recorded_metrics_available": True,
+        "split_verified_against_reseeded_split": split.verified_against_seed,
+        "n_test_matches": int(rec_test["n"]) == int(len(split.y_test)),
+        "max_abs_metric_difference": max(checks.values()),
+        "tolerance": atol,
+        "metrics_match_recorded": bool(
+            int(rec_test["n"]) == int(len(split.y_test)) and max(checks.values()) <= atol
+        ),
+        "recorded_test_metrics": {k: rec_test[k] for k in checks},
+    }
+    if not integrity["metrics_match_recorded"]:
+        raise ValueError(
+            f"{label}: the persisted model does not reproduce its recorded test metrics "
+            f"(max |diff| = {max(checks.values()):.2e} > {atol})."
+        )
+    model_info = recorded.get("model", {})
+    summary = {
+        "label": _label(label),
+        "n_features": int(pipeline["preprocess"].get_feature_names_out().shape[0]),
+        "n_trees": model_info.get("n_trees"),
+        "fit_seconds": model_info.get("fit_seconds"),
+        "predict_seconds_test": round(predict_seconds, 3),
+        "model_size_mb": round(model_path.stat().st_size / 1e6, 3),
+        "metrics_test": m_test,
+        "metrics_train": recorded["metrics"]["train"],
     }
     return BaselineReference(y_prob_test=p_test, summary=summary, integrity=integrity)
 

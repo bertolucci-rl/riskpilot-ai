@@ -1,0 +1,345 @@
+{
+  "run": {
+    "timestamp_utc": "2026-09-17T23:26:34+00:00",
+    "riskpilot_version": "0.1.0",
+    "lightgbm_version": "4.7.0",
+    "total_seconds": 795.4
+  },
+  "config": {
+    "valid_size": 0.2,
+    "random_state": 42,
+    "n_jobs": 6,
+    "n_bootstrap_validation": 500,
+    "bootstrap_seed": 42,
+    "n_calibration_bins": 10,
+    "sources": [
+      "bureau",
+      "previous",
+      "installments",
+      "credit_card",
+      "pos"
+    ],
+    "include_single": true,
+    "include_leave_one_out": true,
+    "param_overrides": {},
+    "retune_axes": [
+      [
+        "num_leaves",
+        [
+          15,
+          31
+        ]
+      ],
+      [
+        "min_child_samples",
+        [
+          100,
+          500
+        ]
+      ],
+      [
+        "colsample_bytree",
+        [
+          0.3,
+          0.5
+        ]
+      ],
+      [
+        "reg_lambda",
+        [
+          1.0,
+          10.0
+        ]
+      ]
+    ],
+    "early_stopping_rounds": 100,
+    "n_bootstrap_test": 1000
+  },
+  "frozen_lightgbm_spec": {
+    "library": "lightgbm",
+    "params": {
+      "objective": "binary",
+      "learning_rate": 0.02,
+      "n_estimators": 1380,
+      "num_leaves": 15,
+      "max_depth": -1,
+      "min_child_samples": 500,
+      "subsample": 0.8,
+      "subsample_freq": 1,
+      "colsample_bytree": 0.5,
+      "reg_alpha": 0.0,
+      "reg_lambda": 1.0,
+      "random_state": 42,
+      "n_jobs": 6,
+      "verbose": 0
+    },
+    "heavy_tail": "none",
+    "missing_indicators": "none"
+  },
+  "validation_split": {
+    "strategy": "stratified holdout inside the frozen training portion (as Milestone 2)",
+    "membership_file": "data/processed/internal_validation_membership.csv",
+    "n_fit": 196806,
+    "n_valid": 49202,
+    "prevalence_fit": 0.08072924605957135,
+    "prevalence_valid": 0.0807284256737531
+  },
+  "full_matrix": {
+    "n_rows": 246008,
+    "n_features": 291,
+    "history_coverage": {
+      "bureau": 0.8567363619804382,
+      "previous": 0.9464489221572876,
+      "installments": 0.9484325647354126,
+      "credit_card": 0.283255010843277,
+      "pos": 0.9412539601325989
+    }
+  },
+  "source_value": {
+    "bureau": {
+      "history_coverage": 0.8567363619804382,
+      "n_features": 49,
+      "single_source_gain_log_loss": 0.0028012847778334793,
+      "single_source_gain_roc_auc": 0.009955483208904936,
+      "leave_one_out_cost_log_loss": 0.002114893364719317,
+      "leave_one_out_cost_roc_auc": 0.005835019356143056
+    },
+    "previous": {
+      "history_coverage": 0.9464489221572876,
+      "n_features": 42,
+      "single_source_gain_log_loss": 0.0034098678411245698,
+      "single_source_gain_roc_auc": 0.012074094162119464,
+      "leave_one_out_cost_log_loss": 0.0011277988951691742,
+      "leave_one_out_cost_roc_auc": 0.003474331374229367
+    },
+    "installments": {
+      "history_coverage": 0.9484325647354126,
+      "n_features": 26,
+      "single_source_gain_log_loss": 0.0034023674416475136,
+      "single_source_gain_roc_auc": 0.012520770531905812,
+      "leave_one_out_cost_log_loss": 0.0017863760230849568,
+      "leave_one_out_cost_roc_auc": 0.006027645653111424
+    },
+    "credit_card": {
+      "history_coverage": 0.283255010843277,
+      "n_features": 34,
+      "single_source_gain_log_loss": 0.0013417430385238849,
+      "single_source_gain_roc_auc": 0.005082220469218579,
+      "leave_one_out_cost_log_loss": 0.0007008116384362439,
+      "leave_one_out_cost_roc_auc": 0.001760054184286708
+    },
+    "pos": {
+      "history_coverage": 0.9412539601325989,
+      "n_features": 20,
+      "single_source_gain_log_loss": 0.002707367437431607,
+      "single_source_gain_roc_auc": 0.009007731324667145,
+      "leave_one_out_cost_log_loss": 0.0006866611421701696,
+      "leave_one_out_cost_roc_auc": 0.0019191715432749223
+    }
+  },
+  "elimination": {
+    "retained": [
+      "bureau",
+      "previous",
+      "installments",
+      "credit_card",
+      "pos"
+    ],
+    "final_config": "M5_+pos",
+    "rounds": [
+      {
+        "remaining_before": [
+          "bureau",
+          "previous",
+          "installments",
+          "credit_card",
+          "pos"
+        ],
+        "full_config": "M5_+pos",
+        "candidates": [
+          {
+            "source": "bureau",
+            "config": "L-bureau",
+            "removal_cost_log_loss": 0.002114893364719317,
+            "ci_low": 0.0015364879006559543,
+            "ci_high": 0.0026832898001416332,
+            "removal_cost_roc_auc": 0.005835019356143056,
+            "roc_auc_ci_low": 0.00405032241038105,
+            "roc_auc_ci_high": 0.007702391200227474,
+            "fraction_worse_without": 1.0
+          },
+          {
+            "source": "previous",
+            "config": "L-previous",
+            "removal_cost_log_loss": 0.0011277988951691742,
+            "ci_low": 0.0006555142824610596,
+            "ci_high": 0.001654478513561156,
+            "removal_cost_roc_auc": 0.003474331374229367,
+            "roc_auc_ci_low": 0.0020110367393911003,
+            "roc_auc_ci_high": 0.005136662337884689,
+            "fraction_worse_without": 1.0
+          },
+          {
+            "source": "installments",
+            "config": "L-installments",
+            "removal_cost_log_loss": 0.0017863760230849568,
+            "ci_low": 0.001244398254462465,
+            "ci_high": 0.002359570704647799,
+            "removal_cost_roc_auc": 0.006027645653111424,
+            "roc_auc_ci_low": 0.004320342260717297,
+            "roc_auc_ci_high": 0.007755747484371908,
+            "fraction_worse_without": 1.0
+          },
+          {
+            "source": "credit_card",
+            "config": "L-credit_card",
+            "removal_cost_log_loss": 0.0007008116384362439,
+            "ci_low": 0.0002362515624900655,
+            "ci_high": 0.0012038493908520446,
+            "removal_cost_roc_auc": 0.001760054184286708,
+            "roc_auc_ci_low": 0.00035615160452026623,
+            "roc_auc_ci_high": 0.003356392939920874,
+            "fraction_worse_without": 0.996
+          },
+          {
+            "source": "pos",
+            "config": "M4_+credit_card",
+            "removal_cost_log_loss": 0.0006866611421701696,
+            "ci_low": 0.0002922925184305342,
+            "ci_high": 0.001047377888241606,
+            "removal_cost_roc_auc": 0.0019191715432749223,
+            "roc_auc_ci_low": 0.0006520111241381556,
+            "roc_auc_ci_high": 0.0030246881738903554,
+            "fraction_worse_without": 1.0
+          }
+        ],
+        "weakest": "pos",
+        "dropped": false
+      }
+    ]
+  },
+  "retained_sources": [
+    "bureau",
+    "previous",
+    "installments",
+    "credit_card",
+    "pos"
+  ],
+  "retained_config": "M5_+pos",
+  "retained_validation_metrics": {
+    "n_features": 291,
+    "roc_auc": 0.7854944984112756,
+    "pr_auc": 0.2760368289065412,
+    "log_loss": 0.23795808782845365,
+    "brier": 0.06618063209741455,
+    "brier_skill": 0.10821411001593928,
+    "ece": 0.005747915454362944
+  },
+  "application_only_validation_metrics": {
+    "n_features": 120,
+    "roc_auc": 0.7546842934812982,
+    "pr_auc": 0.23795016212021625,
+    "log_loss": 0.2471745094112423,
+    "brier": 0.0680835467506748,
+    "brier_skill": 0.0825722812234384,
+    "ece": 0.0034988812802201545
+  },
+  "artifacts": {
+    "ablation": "artifacts/metrics/relational_ablation.csv",
+    "validation_predictions": "data/processed/relational_validation_predictions.parquet"
+  },
+  "retune": {
+    "run": {
+      "timestamp_utc": "2026-09-17T23:34:22+00:00",
+      "riskpilot_version": "0.1.0",
+      "lightgbm_version": "4.7.0",
+      "total_seconds": 468.2
+    },
+    "axes": [
+      [
+        "num_leaves",
+        [
+          15,
+          31
+        ]
+      ],
+      [
+        "min_child_samples",
+        [
+          100,
+          500
+        ]
+      ],
+      [
+        "colsample_bytree",
+        [
+          0.3,
+          0.5
+        ]
+      ],
+      [
+        "reg_lambda",
+        [
+          1.0,
+          10.0
+        ]
+      ]
+    ],
+    "n_trials": 5,
+    "selected_trial": "lightgbm-04",
+    "locked_spec": {
+      "library": "lightgbm",
+      "params": {
+        "objective": "binary",
+        "learning_rate": 0.02,
+        "n_estimators": 2635,
+        "num_leaves": 15,
+        "max_depth": -1,
+        "min_child_samples": 500,
+        "subsample": 0.8,
+        "subsample_freq": 1,
+        "colsample_bytree": 0.3,
+        "reg_alpha": 0.0,
+        "reg_lambda": 1.0,
+        "random_state": 42,
+        "n_jobs": 6,
+        "verbose": 0
+      },
+      "heavy_tail": "none",
+      "missing_indicators": "none"
+    },
+    "changed_vs_frozen": {
+      "colsample_bytree": {
+        "frozen": 0.5,
+        "retuned": 0.3
+      },
+      "n_estimators": {
+        "frozen": 1380,
+        "retuned": 2635
+      }
+    },
+    "validation_metrics": {
+      "roc_auc": 0.7873521738172068,
+      "average_precision": 0.2757720972645166,
+      "log_loss": 0.2375311846736214,
+      "brier_score": 0.06617499091169658,
+      "brier_skill_score": 0.108290125153097,
+      "expected_calibration_error": 0.005664140801073705,
+      "calibration_slope": 0.9726081088236115,
+      "calibration_intercept": -0.03771679222655449,
+      "mean_predicted_probability": 0.07957267660269833
+    },
+    "frozen_configuration_validation_metrics": {
+      "n_features": 291,
+      "roc_auc": 0.7854944984112756,
+      "pr_auc": 0.2760368289065412,
+      "log_loss": 0.23795808782845365,
+      "brier": 0.06618063209741455,
+      "brier_skill": 0.10821411001593928,
+      "ece": 0.005747915454362944
+    },
+    "artifacts": {
+      "trials": "artifacts/metrics/relational_trials.csv"
+    }
+  }
+}

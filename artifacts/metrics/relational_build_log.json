@@ -1,0 +1,127 @@
+{
+  "sources": {
+    "bureau": {
+      "built_at_utc": "2026-09-17T23:03:43+00:00",
+      "riskpilot_version": "0.1.0",
+      "raw_files": {
+        "bureau": {
+          "file": "bureau.csv",
+          "size_bytes": 170016717,
+          "mtime": 1789685349.8777926
+        },
+        "bureau_balance": {
+          "file": "bureau_balance.csv",
+          "size_bytes": 375592889,
+          "mtime": 1789685360.5377836
+        }
+      },
+      "nrows": null,
+      "input_rows": {
+        "bureau_rows": 1716428,
+        "bureau_balance_rows": 27299925
+      },
+      "output_customers": 305811,
+      "n_features": 48,
+      "seconds": 30.6,
+      "output_memory_mb": 59.9,
+      "output_file_mb": 22.1,
+      "path": "data/processed/relational/bureau.parquet"
+    },
+    "previous": {
+      "built_at_utc": "2026-09-17T23:03:58+00:00",
+      "riskpilot_version": "0.1.0",
+      "raw_files": {
+        "previous": {
+          "file": "previous_application.csv",
+          "size_bytes": 404973293,
+          "mtime": 1789685370.4149158
+        }
+      },
+      "nrows": null,
+      "input_rows": {
+        "previous_rows": 1670214
+      },
+      "output_customers": 338857,
+      "n_features": 41,
+      "seconds": 15.3,
+      "output_memory_mb": 56.9,
+      "output_file_mb": 24.4,
+      "path": "data/processed/relational/previous.parquet"
+    },
+    "installments": {
+      "built_at_utc": "2026-09-17T23:04:37+00:00",
+      "riskpilot_version": "0.1.0",
+      "raw_files": {
+        "installments": {
+          "file": "installments_payments.csv",
+          "size_bytes": 723118349,
+          "mtime": 1789685389.5610254
+        }
+      },
+      "nrows": null,
+      "input_rows": {
+        "installments_rows": 13605401
+      },
+      "output_customers": 339587,
+      "n_features": 25,
+      "seconds": 38.8,
+      "output_memory_mb": 35.3,
+      "output_file_mb": 15.1,
+      "path": "data/processed/relational/installments.parquet"
+    },
+    "credit_card": {
+      "built_at_utc": "2026-09-17T23:04:50+00:00",
+      "riskpilot_version": "0.1.0",
+      "raw_files": {
+        "credit_card": {
+          "file": "credit_card_balance.csv",
+          "size_bytes": 424582605,
+          "mtime": 1789685400.9033327
+        }
+      },
+      "nrows": null,
+      "input_rows": {
+        "credit_card_rows": 3840312
+      },
+      "output_customers": 103558,
+      "n_features": 33,
+      "seconds": 12.6,
+      "output_memory_mb": 14.1,
+      "output_file_mb": 7.7,
+      "path": "data/processed/relational/credit_card.parquet"
+    },
+    "pos": {
+      "built_at_utc": "2026-09-17T23:05:21+00:00",
+      "riskpilot_version": "0.1.0",
+      "raw_files": {
+        "pos": {
+          "file": "POS_CASH_balance.csv",
+          "size_bytes": 392703158,
+          "mtime": 1789685412.0319464
+        }
+      },
+      "nrows": null,
+      "input_rows": {
+        "pos_rows": 10001358
+      },
+      "output_customers": 337252,
+      "n_features": 19,
+      "seconds": 31.2,
+      "output_memory_mb": 27.0,
+      "output_file_mb": 8.6,
+      "path": "data/processed/relational/pos.parquet"
+    }
+  },
+  "last_run": {
+    "at_utc": "2026-09-17T23:05:21+00:00",
+    "status": {
+      "bureau": "built",
+      "previous": "built",
+      "installments": "built",
+      "credit_card": "built",
+      "pos": "built"
+    },
+    "raw_dir": "data/raw",
+    "processed_dir": "data/processed/relational"
+  }
+}

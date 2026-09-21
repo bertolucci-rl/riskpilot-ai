@@ -1,0 +1,501 @@
+{
+  "bureau": {
+    "grain": {
+      "n_rows": 1716428,
+      "n_customers": 305811,
+      "sk_id_bureau_unique": true
+    },
+    "temporal": {
+      "DAYS_CREDIT": {
+        "min": -2922.0,
+        "max": 0.0,
+        "n_positive": 0
+      },
+      "DAYS_CREDIT_ENDDATE": {
+        "min": -42060.0,
+        "max": 31199.0,
+        "n_positive": 602603
+      },
+      "DAYS_ENDDATE_FACT": {
+        "min": -42023.0,
+        "max": 0.0,
+        "n_positive": 0
+      },
+      "DAYS_CREDIT_UPDATE": {
+        "min": -41947.0,
+        "max": 372.0,
+        "n_positive": 17
+      }
+    },
+    "credit_active": {
+      "Closed": 1079273,
+      "Active": 630607,
+      "Sold": 6527,
+      "Bad debt": 21
+    },
+    "credit_type": {
+      "Consumer credit": 1251615,
+      "Credit card": 402195,
+      "Car loan": 27690,
+      "Mortgage": 18391,
+      "Microloan": 12413,
+      "Loan for business development": 1975,
+      "Another type of loan": 1017,
+      "Unknown type of loan": 555,
+      "Loan for working capital replenishment": 469,
+      "Cash loan (non-earmarked)": 56,
+      "Real estate loan": 27,
+      "Loan for the purchase of equipment": 19,
+      "Loan for purchase of shares (margin lending)": 4,
+      "Mobile operator loan": 1,
+      "Interbank credit": 1
+    },
+    "amounts": {
+      "AMT_CREDIT_SUM": {
+        "n": 1716428,
+        "n_missing": 13,
+        "n_negative": 0,
+        "n_zero": 66582,
+        "min": 0.0,
+        "median": 125518.5,
+        "q99": 3700916.0999999824,
+        "max": 585000000.0
+      },
+      "AMT_CREDIT_SUM_DEBT": {
+        "n": 1716428,
+        "n_missing": 257669,
+        "n_negative": 8418,
+        "n_zero": 1016434,
+        "min": -4705600.5,
+        "median": 0.0,
+        "q99": 2259728.4599999953,
+        "max": 170100000.0
+      },
+      "AMT_CREDIT_SUM_LIMIT": {
+        "n": 1716428,
+        "n_missing": 591780,
+        "n_negative": 351,
+        "n_zero": 1050142,
+        "min": -586406.125,
+        "median": 0.0,
+        "q99": 199620.55984375026,
+        "max": 4705600.5
+      },
+      "AMT_CREDIT_SUM_OVERDUE": {
+        "n": 1716428,
+        "n_missing": 0,
+        "n_negative": 0,
+        "n_zero": 1712270,
+        "min": 0.0,
+        "median": 0.0,
+        "q99": 0.0,
+        "max": 3756681.0
+      },
+      "AMT_CREDIT_MAX_OVERDUE": {
+        "n": 1716428,
+        "n_missing": 1124488,
+        "n_negative": 0,
+        "n_zero": 470650,
+        "min": 0.0,
+        "median": 0.0,
+        "q99": 41988.745898437475,
+        "max": 115987184.0
+      },
+      "CREDIT_DAY_OVERDUE": {
+        "n": 1716428,
+        "n_missing": 0,
+        "n_negative": 0,
+        "n_zero": 1712211,
+        "min": 0.0,
+        "median": 0.0,
+        "q99": 0.0,
+        "max": 2792.0
+      }
+    },
+    "anomalies": {
+      "debt_exceeds_credit_sum_rows": 29642,
+      "negative_debt_rows_clipped": 8418,
+      "negative_limit_rows_clipped": 351,
+      "positive_days_credit_update_rows_clipped": 17,
+      "active_with_past_enddate_rows": 76359
+    },
+    "bureau_balance": {
+      "n_rows": 27299925,
+      "n_credits": 817395,
+      "credits_in_bureau_with_history": 774354,
+      "months_min": -96,
+      "months_max": 0,
+      "duplicate_credit_month_rows": 0,
+      "status_counts": {
+        "C": 13646993,
+        "0": 7499507,
+        "X": 5810482,
+        "1": 242347,
+        "5": 62406,
+        "2": 23419,
+        "3": 8924,
+        "4": 5847
+      }
+    }
+  },
+  "previous": {
+    "grain": {
+      "n_rows": 1670214,
+      "n_customers": 338857,
+      "sk_id_prev_unique": true
+    },
+    "temporal": {
+      "DAYS_DECISION": {
+        "min": -2922.0,
+        "max": -1.0,
+        "n_positive": 0
+      }
+    },
+    "excluded_temporal_columns": [
+      "DAYS_FIRST_DRAWING",
+      "DAYS_FIRST_DUE",
+      "DAYS_LAST_DUE_1ST_VERSION",
+      "DAYS_LAST_DUE",
+      "DAYS_TERMINATION"
+    ],
+    "contract_status": {
+      "Approved": 1036781,
+      "Canceled": 316319,
+      "Refused": 290678,
+      "Unused offer": 26436
+    },
+    "reject_reason": {
+      "XAP": 1353093,
+      "HC": 175231,
+      "LIMIT": 55680,
+      "SCO": 37467,
+      "CLIENT": 26436,
+      "SCOFR": 12811,
+      "XNA": 5244,
+      "VERIF": 3535,
+      "SYSTEM": 717
+    },
+    "contract_type": {
+      "Cash loans": 747553,
+      "Consumer loans": 729151,
+      "Revolving loans": 193164,
+      "XNA": 346
+    },
+    "amounts": {
+      "AMT_APPLICATION": {
+        "n": 1670214,
+        "n_missing": 0,
+        "n_negative": 0,
+        "n_zero": 392402,
+        "min": 0.0,
+        "median": 71046.0,
+        "q99": 1350000.0,
+        "max": 6905160.0
+      },
+      "AMT_CREDIT": {
+        "n": 1670214,
+        "n_missing": 1,
+        "n_negative": 0,
+        "n_zero": 336768,
+        "min": 0.0,
+        "median": 80541.0,
+        "q99": 1515377.6999999648,
+        "max": 6905160.0
+      },
+      "AMT_ANNUITY": {
+        "n": 1670214,
+        "n_missing": 372235,
+        "n_negative": 0,
+        "n_zero": 1637,
+        "min": 0.0,
+        "median": 11250.0,
+        "q99": 69685.78874999992,
+        "max": 418058.15625
+      },
+      "AMT_DOWN_PAYMENT": {
+        "n": 1670214,
+        "n_missing": 895844,
+        "n_negative": 2,
+        "n_zero": 369854,
+        "min": -0.8999999761581421,
+        "median": 1638.0,
+        "q99": 65930.89499999973,
+        "max": 3060045.0
+      },
+      "CNT_PAYMENT": {
+        "n": 1670214,
+        "n_missing": 372230,
+        "n_negative": 0,
+        "n_zero": 144985,
+        "min": 0.0,
+        "median": 12.0,
+        "q99": 60.0,
+        "max": 84.0
+      }
+    },
+    "anomalies": {
+      "zero_application_amount_rows": 392402,
+      "approved_with_zero_credit_rows": 1551,
+      "negative_down_payment_rows": 2
+    },
+    "excluded_temporal_detail": {
+      "DAYS_FIRST_DRAWING": {
+        "n_missing": 673065,
+        "n_placeholder_365243": 934444,
+        "n_positive_real": 0,
+        "min": -2922.0
+      },
+      "DAYS_FIRST_DUE": {
+        "n_missing": 673065,
+        "n_placeholder_365243": 40645,
+        "n_positive_real": 0,
+        "min": -2892.0
+      },
+      "DAYS_LAST_DUE_1ST_VERSION": {
+        "n_missing": 673065,
+        "n_placeholder_365243": 93864,
+        "n_positive_real": 224392,
+        "min": -2801.0
+      },
+      "DAYS_LAST_DUE": {
+        "n_missing": 673065,
+        "n_placeholder_365243": 211221,
+        "n_positive_real": 0,
+        "min": -2889.0
+      },
+      "DAYS_TERMINATION": {
+        "n_missing": 673065,
+        "n_placeholder_365243": 225913,
+        "n_positive_real": 0,
+        "min": -2874.0
+      }
+    }
+  },
+  "installments": {
+    "grain": {
+      "n_rows": 13605401,
+      "n_customers": 339587,
+      "n_previous_credits": 997752,
+      "rows_sharing_an_installment_key": 653483,
+      "share_sharing_an_installment_key": 0.04803114586626296
+    },
+    "temporal": {
+      "DAYS_INSTALMENT": {
+        "min": -2922.0,
+        "max": -1.0,
+        "n_positive": 0
+      },
+      "DAYS_ENTRY_PAYMENT": {
+        "min": -4921.0,
+        "max": -1.0,
+        "n_positive": 0
+      }
+    },
+    "days_late_convention": {
+      "definition": "DAYS_ENTRY_PAYMENT - DAYS_INSTALMENT; positive = paid after due date",
+      "mean": -8.787405014038086,
+      "median": -6.0,
+      "share_positive": 0.08428042657471103,
+      "share_over_30": 0.002840195595851971,
+      "max": 2884.0
+    },
+    "amounts": {
+      "AMT_INSTALMENT": {
+        "n": 13605401,
+        "n_missing": 0,
+        "n_negative": 0,
+        "n_zero": 290,
+        "min": 0.0,
+        "median": 8884.080078125,
+        "q99": 146068.6875,
+        "max": 3771487.75
+      },
+      "AMT_PAYMENT": {
+        "n": 13605401,
+        "n_missing": 2905,
+        "n_negative": 0,
+        "n_zero": 1440,
+        "min": 0.0,
+        "median": 8125.51513671875,
+        "q99": 178003.96250000037,
+        "max": 3771487.75
+      }
+    },
+    "payment_ratio_rows": {
+      "median": 1.0,
+      "share_below_0_99": 0.07853535518725248,
+      "share_above_1_01": 0.01308568560382748,
+      "n_zero_scheduled": 290
+    },
+    "anomalies": {
+      "missing_payment_date_rows": 2905,
+      "missing_payment_amount_rows": 2905,
+      "negative_amount_rows": 0
+    }
+  },
+  "credit_card": {
+    "grain": {
+      "n_rows": 3840312,
+      "n_customers": 103558,
+      "n_cards": 104307,
+      "duplicate_card_month_rows": 0
+    },
+    "temporal": {
+      "months_min": -96,
+      "months_max": -1
+    },
+    "status": {
+      "Active": 3698436,
+      "Completed": 128918,
+      "Signed": 11058,
+      "Demand": 1365,
+      "Sent proposal": 513,
+      "Refused": 17,
+      "Approved": 5
+    },
+    "amounts": {
+      "AMT_BALANCE": {
+        "n": 3840312,
+        "n_missing": 0,
+        "n_negative": 2345,
+        "n_zero": 2156420,
+        "min": -420250.1875,
+        "median": 0.0,
+        "q99": 466295.1156250001,
+        "max": 1505902.125
+      },
+      "AMT_CREDIT_LIMIT_ACTUAL": {
+        "n": 3840312,
+        "n_missing": 0,
+        "n_negative": 0,
+        "n_zero": 753823,
+        "min": 0.0,
+        "median": 112500.0,
+        "q99": 765000.0,
+        "max": 1350000.0
+      },
+      "AMT_DRAWINGS_CURRENT": {
+        "n": 3840312,
+        "n_missing": 0,
+        "n_negative": 3,
+        "n_zero": 3223443,
+        "min": -6211.6201171875,
+        "median": 0.0,
+        "q99": 157500.0,
+        "max": 2287098.25
+      },
+      "AMT_PAYMENT_TOTAL_CURRENT": {
+        "n": 3840312,
+        "n_missing": 0,
+        "n_negative": 0,
+        "n_zero": 2172223,
+        "min": 0.0,
+        "median": 0.0,
+        "q99": 128614.9261718755,
+        "max": 4278315.5
+      },
+      "SK_DPD": {
+        "n": 3840312,
+        "n_missing": 0,
+        "n_negative": 0,
+        "n_zero": 3686957,
+        "min": 0.0,
+        "median": 0.0,
+        "q99": 274.0,
+        "max": 3260.0
+      },
+      "SK_DPD_DEF": {
+        "n": 3840312,
+        "n_missing": 0,
+        "n_negative": 0,
+        "n_zero": 3750972,
+        "min": 0.0,
+        "median": 0.0,
+        "q99": 1.0,
+        "max": 3260.0
+      }
+    },
+    "utilization": {
+      "zero_limit_rows": 753823,
+      "median": 0.01134399976581335,
+      "q99": 1.069404125213623,
+      "share_over_1": 0.08706636335797717,
+      "max": 11.777510643005371
+    },
+    "anomalies": {
+      "negative_balance_rows": 2345,
+      "dpd_positive_share": 0.039932953364205825,
+      "dpd_def_positive_share": 0.02326373482154575
+    }
+  },
+  "pos": {
+    "grain": {
+      "n_rows": 10001358,
+      "n_customers": 337252,
+      "n_contracts": 936325,
+      "duplicate_contract_month_rows": 0
+    },
+    "temporal": {
+      "months_min": -96,
+      "months_max": -1
+    },
+    "status": {
+      "Active": 9151119,
+      "Completed": 744883,
+      "Signed": 87260,
+      "Demand": 7065,
+      "Returned to the store": 5461,
+      "Approved": 4917,
+      "Amortized debt": 636,
+      "Canceled": 15,
+      "XNA": 2
+    },
+    "counts": {
+      "CNT_INSTALMENT": {
+        "n": 10001358,
+        "n_missing": 26071,
+        "n_negative": 0,
+        "n_zero": 0,
+        "min": 1.0,
+        "median": 12.0,
+        "q99": 60.0,
+        "max": 92.0
+      },
+      "CNT_INSTALMENT_FUTURE": {
+        "n": 10001358,
+        "n_missing": 26087,
+        "n_negative": 0,
+        "n_zero": 1185960,
+        "min": 0.0,
+        "median": 7.0,
+        "q99": 53.0,
+        "max": 85.0
+      },
+      "SK_DPD": {
+        "n": 10001358,
+        "n_missing": 0,
+        "n_negative": 0,
+        "n_zero": 9706131,
+        "min": 0.0,
+        "median": 0.0,
+        "q99": 235.0,
+        "max": 4231.0
+      },
+      "SK_DPD_DEF": {
+        "n": 10001358,
+        "n_missing": 0,
+        "n_negative": 0,
+        "n_zero": 9887389,
+        "min": 0.0,
+        "median": 0.0,
+        "q99": 1.0,
+        "max": 3595.0
+      }
+    },
+    "anomalies": {
+      "future_exceeds_term_rows": 7420,
+      "dpd_positive_share": 0.02951869136171308,
+      "dpd_def_positive_share": 0.011395352511128989
+    }
+  }
+}

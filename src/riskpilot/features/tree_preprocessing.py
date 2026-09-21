@@ -250,13 +250,15 @@ class TreePreprocessor(BaseEstimator, TransformerMixin):
         blocks: list[pd.DataFrame] = []
 
         if self.numeric_columns_:
-            num = Xc[self.numeric_columns_].astype("float64")
+            # Cast once, directly to the target dtype: no float64 intermediate copy
+            # (matters with ~300 columns x 250k rows on an 8 GB machine).
+            num = Xc[self.numeric_columns_].astype(self.float_dtype)
             for col, (lo, hi) in self.clip_bounds_.items():
                 num[col] = num[col].clip(lower=lo, upper=hi)
             if self.heavy_tail == "log1p":
                 for col in self.heavy_tail_columns_:
-                    num[col] = np.log1p(num[col].clip(lower=0.0))
-            blocks.append(num.astype(self.float_dtype))
+                    num[col] = np.log1p(num[col].clip(lower=0.0)).astype(self.float_dtype)
+            blocks.append(num)
 
         if self.categorical_columns_:
             cat = pd.DataFrame(

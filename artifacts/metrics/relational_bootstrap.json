@@ -1,0 +1,235 @@
+{
+  "method": "paired percentile bootstrap; each replicate resamples the test rows with replacement (multinomial counts used as sample weights) and scores every model on the same resample",
+  "n": 61503,
+  "n_positive": 4965,
+  "n_replicates": 1000,
+  "seed": 42,
+  "confidence_level": 0.95,
+  "reference": "lightgbm",
+  "metrics": [
+    "roc_auc",
+    "average_precision",
+    "log_loss",
+    "brier_score"
+  ],
+  "models": {
+    "logistic_regression": {
+      "roc_auc": {
+        "estimate": 0.7504123473248321,
+        "ci_low": 0.7425040618793278,
+        "ci_high": 0.7577922651656039,
+        "bootstrap_mean": 0.7503298966195484,
+        "bootstrap_sd": 0.003788278966173153
+      },
+      "average_precision": {
+        "estimate": 0.23531823859611234,
+        "ci_low": 0.22408595451174598,
+        "ci_high": 0.24730429873313733,
+        "bootstrap_mean": 0.23548511591810525,
+        "bootstrap_sd": 0.005894012368810828
+      },
+      "log_loss": {
+        "estimate": 0.24820499894091352,
+        "ci_low": 0.24373571427703342,
+        "ci_high": 0.2530564800092185,
+        "bootstrap_mean": 0.2482546612402746,
+        "bootstrap_sd": 0.002428245251703194
+      },
+      "brier_score": {
+        "estimate": 0.06821592765037675,
+        "ci_low": 0.0667015508363188,
+        "ci_high": 0.06976544138995497,
+        "bootstrap_mean": 0.06823189177925337,
+        "bootstrap_sd": 0.0007924988984477954
+      }
+    },
+    "lightgbm": {
+      "roc_auc": {
+        "estimate": 0.7622001575498403,
+        "ci_low": 0.7548533617690718,
+        "ci_high": 0.7693361989318461,
+        "bootstrap_mean": 0.7621419080192499,
+        "bootstrap_sd": 0.0037236745322771184
+      },
+      "average_precision": {
+        "estimate": 0.25380570791039625,
+        "ci_low": 0.24198740584918277,
+        "ci_high": 0.2655759679003522,
+        "bootstrap_mean": 0.2538504593388058,
+        "bootstrap_sd": 0.006239294291173488
+      },
+      "log_loss": {
+        "estimate": 0.2445564646536432,
+        "ci_low": 0.2400423502813417,
+        "ci_high": 0.2495267528396649,
+        "bootstrap_mean": 0.24460552309385208,
+        "bootstrap_sd": 0.0024139158596236296
+      },
+      "brier_score": {
+        "estimate": 0.06739081387345636,
+        "ci_low": 0.06590187210825146,
+        "ci_high": 0.06898194924258087,
+        "bootstrap_mean": 0.0674077773388308,
+        "bootstrap_sd": 0.0007874232713494921
+      }
+    },
+    "lightgbm_relational": {
+      "roc_auc": {
+        "estimate": 0.7900037251812958,
+        "ci_low": 0.7832936218168585,
+        "ci_high": 0.7964096103753813,
+        "bootstrap_mean": 0.7900394281653046,
+        "bootstrap_sd": 0.0034249431216828905
+      },
+      "average_precision": {
+        "estimate": 0.29430722660736136,
+        "ci_low": 0.28169279936616654,
+        "ci_high": 0.3077800780311099,
+        "bootstrap_mean": 0.2946310414483709,
+        "bootstrap_sd": 0.006820146701293513
+      },
+      "log_loss": {
+        "estimate": 0.23535181801644292,
+        "ci_low": 0.23093139217846176,
+        "ci_high": 0.24010241248507366,
+        "bootstrap_mean": 0.23536019865657573,
+        "bootstrap_sd": 0.0023811440556285464
+      },
+      "brier_score": {
+        "estimate": 0.06531596490502936,
+        "ci_low": 0.0639018717229173,
+        "ci_high": 0.06689551304301164,
+        "bootstrap_mean": 0.06532133708462866,
+        "bootstrap_sd": 0.0007691539111611284
+      }
+    }
+  },
+  "differences": {
+    "logistic_regression_vs_lightgbm": {
+      "model": "logistic_regression",
+      "reference": "lightgbm",
+      "roc_auc": {
+        "estimate": -0.011787810225008188,
+        "ci_low": -0.014475978755775623,
+        "ci_high": -0.009174176327814351,
+        "bootstrap_mean": -0.011812011399701523,
+        "bootstrap_sd": 0.0013257120833070186,
+        "fraction_improving": 0.0,
+        "ci_excludes_zero": true
+      },
+      "average_precision": {
+        "estimate": -0.01848746931428391,
+        "ci_low": -0.023545637470102396,
+        "ci_high": -0.013021996573542314,
+        "bootstrap_mean": -0.01836534342070052,
+        "bootstrap_sd": 0.0026942316088884345,
+        "fraction_improving": 0.0,
+        "ci_excludes_zero": true
+      },
+      "log_loss": {
+        "estimate": 0.0036485342872703275,
+        "ci_low": 0.0029586539400410176,
+        "ci_high": 0.0043631492817376724,
+        "bootstrap_mean": 0.003649138146422537,
+        "bootstrap_sd": 0.0003708778926974442,
+        "fraction_improving": 0.0,
+        "ci_excludes_zero": true
+      },
+      "brier_score": {
+        "estimate": 0.0008251137769203915,
+        "ci_low": 0.0006309552896721086,
+        "ci_high": 0.0010175334462979087,
+        "bootstrap_mean": 0.0008241144404225651,
+        "bootstrap_sd": 9.994644851767388e-05,
+        "fraction_improving": 0.0,
+        "ci_excludes_zero": true
+      }
+    },
+    "lightgbm_relational_vs_lightgbm": {
+      "model": "lightgbm_relational",
+      "reference": "lightgbm",
+      "roc_auc": {
+        "estimate": 0.027803567631455528,
+        "ci_low": 0.02380361570049631,
+        "ci_high": 0.03157564692776964,
+        "bootstrap_mean": 0.02789752014605459,
+        "bootstrap_sd": 0.002000695883009539,
+        "fraction_improving": 1.0,
+        "ci_excludes_zero": true
+      },
+      "average_precision": {
+        "estimate": 0.04050151869696511,
+        "ci_low": 0.03318905032115035,
+        "ci_high": 0.048226310770612374,
+        "bootstrap_mean": 0.040780582109565096,
+        "bootstrap_sd": 0.003877649728602729,
+        "fraction_improving": 1.0,
+        "ci_excludes_zero": true
+      },
+      "log_loss": {
+        "estimate": -0.009204646637200276,
+        "ci_low": -0.010454423222917187,
+        "ci_high": -0.007972514392033924,
+        "bootstrap_mean": -0.009245324437276355,
+        "bootstrap_sd": 0.0006217336862675885,
+        "fraction_improving": 1.0,
+        "ci_excludes_zero": true
+      },
+      "brier_score": {
+        "estimate": -0.0020748489684269955,
+        "ci_low": -0.002418475255456318,
+        "ci_high": -0.001744070837904916,
+        "bootstrap_mean": -0.002086440254202157,
+        "bootstrap_sd": 0.00017391914187252957,
+        "fraction_improving": 1.0,
+        "ci_excludes_zero": true
+      }
+    },
+    "lightgbm_relational_vs_logistic_regression": {
+      "model": "lightgbm_relational",
+      "reference": "logistic_regression",
+      "roc_auc": {
+        "estimate": 0.039591377856463716,
+        "ci_low": 0.03530274470336406,
+        "ci_high": 0.04408529597401552,
+        "bootstrap_mean": 0.039709531545756106,
+        "bootstrap_sd": 0.002279447191797379,
+        "fraction_improving": 1.0,
+        "ci_excludes_zero": true
+      },
+      "average_precision": {
+        "estimate": 0.05898898801124902,
+        "ci_low": 0.0505366093332264,
+        "ci_high": 0.06862302300675743,
+        "bootstrap_mean": 0.05914592553026561,
+        "bootstrap_sd": 0.004432190072480311,
+        "fraction_improving": 1.0,
+        "ci_excludes_zero": true
+      },
+      "log_loss": {
+        "estimate": -0.012853180924470603,
+        "ci_low": -0.014294346532003574,
+        "ci_high": -0.011500542980429445,
+        "bootstrap_mean": -0.012894462583698892,
+        "bootstrap_sd": 0.0007092792956470625,
+        "fraction_improving": 1.0,
+        "ci_excludes_zero": true
+      },
+      "brier_score": {
+        "estimate": -0.002899962745347387,
+        "ci_low": -0.0033107625610992127,
+        "ci_high": -0.002522202524355761,
+        "bootstrap_mean": -0.0029105546946247216,
+        "bootstrap_sd": 0.00019936611113105155,
+        "fraction_improving": 1.0,
+        "ci_excludes_zero": true
+      }
+    }
+  },
+  "run": {
+    "timestamp_utc": "2026-09-17T23:46:47+00:00",
+    "riskpilot_version": "0.1.0",
+    "lightgbm_version": "4.7.0",
+    "total_seconds": 208.9
+  }
+}

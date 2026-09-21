@@ -4,6 +4,15 @@ Credit Risk Decision Intelligence Platform, built incrementally from a rigorous
 probabilistic baseline toward a full decision engine with explainability,
 monitoring, a FastAPI service and an LLM-based AI Risk Analyst.
 
+What the repository demonstrates so far: a reproducible, leakage-safe credit-risk
+baseline; gradient boosting as a controlled challenger; customer-level feature
+engineering over the relational credit-history tables; statistically controlled
+model comparison on one frozen holdout (paired bootstrap); and probability-focused
+evaluation (proper scores and calibration) throughout.
+
+Milestones 1 and 2 are verified. The relational experiment is recovered work whose
+acceptance review is incomplete; see the [recovery audit](reports/relational_recovery_audit.md).
+
 ## Problem
 
 A lender must decide whether to grant a loan before observing whether the
@@ -28,7 +37,8 @@ model that rejects nobody is 92% "accurate".
 |---|---|---|
 | 1. Probabilistic baseline (Logistic Regression) | complete | ROC-AUC 0.750, calibrated (ECE 0.002) on a frozen 20 % holdout |
 | 2. Gradient-boosting challengers (LightGBM, XGBoost) | complete | ROC-AUC 0.762, PR-AUC +7.9 %, log loss −1.5 %, calibration preserved |
-| 3–10. Calibration, decision engine, explainability, API, monitoring, AI analyst | not started | see roadmap |
+| 3. Relational credit-history features (5 sources, 6 tables) | recovered; incomplete | Recorded ROC-AUC **0.790**; temporal acceptance and reporting corrections pending |
+| 4–10. Calibration, decision engine, explainability, API, monitoring, AI analyst | not started | see roadmap |
 
 ## Milestone 1: probabilistic baseline
 
@@ -47,24 +57,26 @@ Status of this milestone:
 | Technical report (`reports/baseline_report.md`) | done |
 
 The numbers in this README are copied from `artifacts/metrics/baseline_metrics.json`,
-`artifacts/metrics/model_comparison.csv` and `bootstrap_comparison.json` (runs of
-2026-09-16, scikit-learn 1.9.1, LightGBM 4.7.0, XGBoost 3.4.1) and from the executed
-notebooks; the reports explain every one of them.
+`model_comparison.csv`, `bootstrap_comparison.json`, `relational_model_comparison.csv`
+and `relational_bootstrap.json` (runs of 2026-09-16/17, scikit-learn 1.9.1, LightGBM
+4.7.0, XGBoost 3.4.1) and from the executed notebooks; the reports explain every one
+of them.
 
 ## Dataset
 
 [Home Credit Default Risk](https://www.kaggle.com/competitions/home-credit-default-risk)
 (Kaggle). Milestones 1 and 2 use **only** `application_train.csv` (one row per loan
 application, 307,511 rows, 122 columns, binary `TARGET` with prevalence 8.07 %).
-The relational tables
-(bureau, previous applications, installments, ...) are reserved for the
-feature-engineering milestone.
+Milestone 3 adds the six historical tables (`bureau`, `bureau_balance`,
+`previous_application`, `installments_payments`, `credit_card_balance`,
+`POS_CASH_balance`; 2.4 GB, 58 million rows), aggregated to one row per customer.
 
 Raw data is **never committed**: `data/raw/` is git-ignored, and the file must be
 obtained with the official Kaggle CLI after accepting the competition rules:
 
 ```bash
-python -m riskpilot.data.download
+python -m riskpilot.data.download                    # application_train.csv
+python -m riskpilot.data.download --files relational # the six historical tables + column dictionary
 # equivalent to:
 # kaggle competitions download home-credit-default-risk -f application_train.csv -p data/raw
 ```
@@ -244,34 +256,106 @@ per-model figures, `artifacts/metrics/model_comparison.csv`,
 `challenger_trials.csv` (all 33 fits), `challenger_selection.json`,
 `{lightgbm,xgboost}_metrics.json` and `bootstrap_comparison.json`.
 
+## Milestone 3: relational credit-history features (recovered, incomplete)
+
+**Acceptance pending.** The following results reproduce the September 17 experiment,
+but are not accepted as a verified replacement for Milestone 2. Seventeen bureau
+records have future-dated updates that the implementation clips to zero; their
+decision-time availability remains unresolved. The [recovery audit](reports/relational_recovery_audit.md)
+documents this blocker, reporting errors, and the independent verification performed.
+The application-only LightGBM remains the accepted primary model.
+
+**Question.** How much predictive information do the historical tables add beyond the
+application form, source by source, and what happens to probability quality? Details,
+the temporal / leakage audit and every number: `reports/relational_features_report.md`
+and `notebooks/04_relational_features.ipynb`.
+
+**Method.** Each table is aggregated to one row per customer with documented feature
+families (171 features, catalogued in `artifacts/metrics/relational_feature_catalog.csv`),
+joined with validated one-to-one merges, and evaluated with the *frozen* Milestone 2
+LightGBM configuration on the internal validation split: application only, then each
+source added cumulatively, alone, and left out. Sources are retained by backward
+elimination with a validation bootstrap; a small retune follows; the frozen test split
+is scored after selection, and the notebook repeats the locked fit for reproducibility.
+The five ambiguous schedule columns of `previous_application` are excluded, but
+positive bureau update dates were clipped rather than independently justified.
+No class weights, no threshold, no recalibration.
+
+**Internal validation** (49,202 rows, frozen configuration, cumulative sequence):
+
+| Configuration | Features | ROC-AUC | PR-AUC | Log loss | Brier skill |
+|---|---:|---:|---:|---:|---:|
+| application only | 120 | 0.7547 | 0.2380 | 0.2472 | 0.083 |
+| + bureau / bureau_balance | 169 | 0.7646 | 0.2505 | 0.2444 | 0.090 |
+| + previous applications | 211 | 0.7741 | 0.2643 | 0.2415 | 0.099 |
+| + installment payments | 237 | 0.7818 | 0.2726 | 0.2391 | 0.105 |
+| + credit-card balances | 271 | 0.7836 | 0.2736 | 0.2386 | 0.106 |
+| + POS / cash balances | 291 | 0.7855 | 0.2760 | 0.2380 | 0.108 |
+
+All five sources survived leave-one-out elimination (the weakest, POS, still costs a
+reliable +0.0007 log loss when removed). Standalone, previous applications and
+installment payments are the most informative; conditional on the others, the external
+bureau history is the hardest to replace.
+
+**Frozen test split** (61,503 applications), differences with 95 % paired-bootstrap
+intervals (1,000 resamples, seed 42):
+
+| Model | Feature set | ROC-AUC | PR-AUC | Log loss | Brier | Brier skill | ECE | Slope |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| Logistic Regression (Milestone 1) | application (312 after preprocessing) | 0.7504 | 0.2353 | 0.2482 | 0.0682 | 0.081 | 0.0021 | 1.006 |
+| LightGBM (Milestone 2) | application (120) | 0.7622 | 0.2538 | 0.2446 | 0.0674 | 0.092 | 0.0022 | 1.022 |
+| **LightGBM + history** (Milestone 3) | application + 5 sources (291) | **0.7900** | **0.2943** | **0.2354** | **0.0653** | **0.120** | 0.0023 | 1.001 |
+
+| Δ LightGBM + history − | Δ ROC-AUC | Δ PR-AUC | Δ Log loss | Δ Brier |
+|---|---:|---:|---:|---:|
+| application-only LightGBM | +0.0278 [+0.0238, +0.0316] | +0.0405 [+0.0332, +0.0482] | −0.0092 [−0.0105, −0.0080] | −0.0021 [−0.0024, −0.0017] |
+| Logistic Regression | +0.0396 [+0.0353, +0.0441] | +0.0590 [+0.0505, +0.0686] | −0.0129 [−0.0143, −0.0115] | −0.0029 [−0.0033, −0.0025] |
+
+**What it means.** Better information beat better modelling: the historical tables
+are worth about 2.4 × what the change of model class was worth in Milestone 2, both
+proper scores improve with discrimination, and calibration is preserved (mean prediction
+0.080 vs prevalence 0.081, slope 1.00, ECE 0.0023). These are descriptive diagnostics;
+no recalibration comparison was performed, and temporal acceptance remains pending.
+The recorded cost is a 102 s fit (2,635 rounds, 291 features) instead of 37 s and a 4.9 MB
+pipeline instead of 2.6 MB. The whole feature build takes about two minutes and runs
+one table at a time in well under 1 GB.
+
+| Source ablation (validation) | Differences on the frozen test split |
+|---|---|
+| ![Ablation](artifacts/figures/relational_ablation_validation.png) | ![Deltas](artifacts/figures/relational_delta_bootstrap.png) |
+
 ## Architecture
 
 ```text
 riskpilot-ai/
 ├── data/
-│   ├── raw/                  # application_train.csv (git-ignored)
-│   └── processed/            # split membership etc. (git-ignored)
-├── notebooks/                # 01_data_understanding, 02_baseline, 03_gradient_boosting (executed)
+│   ├── raw/                  # application_train.csv + 6 historical tables (git-ignored)
+│   └── processed/            # split memberships, cached relational tables (parquet), predictions (git-ignored)
+├── notebooks/                # 01 data, 02 baseline, 03 challengers, 04 relational features (executed)
 ├── src/riskpilot/
 │   ├── config.py             # pathlib-based paths, RANDOM_STATE, column names, sentinels
 │   ├── data/
-│   │   ├── download.py       # Kaggle CLI wrapper + verification
+│   │   ├── download.py       # Kaggle CLI wrapper + verification (application + relational tables)
 │   │   ├── load.py           # loader with required-column checks, string -> category
 │   │   └── validation.py     # overview, missingness, cardinality, anomalies, leakage screen
 │   ├── features/
 │   │   ├── preprocessing.py       # linear branch: impute + indicators + scale + one-hot
-│   │   └── tree_preprocessing.py  # tree branch: native NaN, categoricals, optional ablations
+│   │   ├── tree_preprocessing.py  # tree branch: native NaN, categoricals, optional ablations
+│   │   └── relational/            # customer-level history: bureau, previous, installments,
+│   │                              #   credit_card, pos_cash builders; assemble (validated joins);
+│   │                              #   build (cached CLI, build log, data audit, feature catalog)
 │   └── models/
 │       ├── train.py          # CLI (M1): split -> fit LR -> evaluate -> persist artifacts
 │       ├── evaluate.py       # metrics, calibration table, figures
 │       ├── challengers.py    # CLI (M2): selection stage -> locked specs -> frozen test
-│       └── comparison.py     # frozen split, baseline integrity, paired bootstrap, figures
+│       ├── comparison.py     # frozen split, persisted-model integrity, paired bootstrap, figures
+│       └── relational_experiment.py  # CLI (M3): source ablation -> elimination -> retune -> frozen test
 ├── tests/                    # pytest suite on small synthetic fixtures
 ├── artifacts/
 │   ├── figures/              # per-model and comparison figures (PNG)
 │   ├── metrics/              # *_metrics.json, model_comparison.csv, trials, selection, bootstrap
 │   └── models/               # fitted pipelines (joblib, git-ignored)
-├── reports/                  # baseline_report.md (M1), challenger_report.md (M2)
+├── reports/                  # baseline_report.md (M1), challenger_report.md (M2), relational_features_report.md (M3)
 ├── pyproject.toml
 └── README.md
 ```
@@ -298,11 +382,19 @@ python -m riskpilot.models.train
 python -m riskpilot.models.challengers            # add --resume to reuse recorded trials
 python -m riskpilot.models.challengers --stage final   # only the frozen-test stage
 
+# Milestone 3: build the customer-level history tables (about 2 min, cached), then the
+# source ablation (14 fits) + elimination + retune (5 fits) + frozen-test stage (about 30 min)
+python -m riskpilot.data.download --files relational
+python -m riskpilot.features.relational.build
+python -m riskpilot.models.relational_experiment  # --stage ablation|retune|final, --resume
+
 # Notebooks, executed in place: 01 audits the data, 02 re-runs the baseline,
-# 03 analyses the selection record and re-runs the frozen-test stage of the challengers
+# 03 analyses the challenger selection, 04 the relational ablation; 03 and 04 re-run
+# their frozen-test stage and check it against the command-line run
 jupyter nbconvert --to notebook --execute --inplace notebooks/01_data_understanding.ipynb
 jupyter nbconvert --to notebook --execute --inplace notebooks/02_baseline.ipynb
 jupyter nbconvert --to notebook --execute --inplace notebooks/03_gradient_boosting.ipynb
+jupyter nbconvert --to notebook --execute --inplace notebooks/04_relational_features.ipynb
 
 # Quality checks
 pytest
@@ -314,7 +406,7 @@ On macOS/Linux replace the activation line with `source .venv/bin/activate`.
 ## Roadmap
 
 1. ~~Challenger models (gradient boosting) against the same split and metrics.~~ Done (Milestone 2).
-2. Feature engineering across the relational tables (bureau, previous applications, installments).
+2. Feature engineering across the relational tables (bureau, previous applications, installments): recovered implementation; acceptance review and corrections pending (Milestone 3).
 3. Probability calibration (Platt / isotonic) with proper held-out comparison.
 4. Cost-sensitive Decision Engine (expected-loss thresholds, approve/review/decline).
 5. Explainability (global and per-decision).
@@ -324,8 +416,9 @@ On macOS/Linux replace the activation line with `source .venv/bin/activate`.
 9. RAG over credit policies.
 10. AI evaluation harness for the analyst.
 
-Item 1 is complete; items 2–10 are not implemented yet (no SHAP, calibration,
-decision engine, API, RAG or agents exist in this repository).
+Item 1 is complete; item 2 is recovered but incomplete. Items 3–10 are not implemented
+yet (no SHAP, formal calibration, decision engine, API, monitoring, RAG or agents exist
+in this repository).
 
 ## License
 

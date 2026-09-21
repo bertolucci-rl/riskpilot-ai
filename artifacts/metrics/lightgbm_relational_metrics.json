@@ -1,0 +1,345 @@
+{
+  "run": {
+    "timestamp_utc": "2026-09-17T23:46:49+00:00",
+    "riskpilot_version": "0.1.0",
+    "lightgbm_version": "4.7.0",
+    "total_seconds": 210.8
+  },
+  "model_key": "lightgbm_relational",
+  "label": "LightGBM + history",
+  "spec": {
+    "library": "lightgbm",
+    "params": {
+      "objective": "binary",
+      "learning_rate": 0.02,
+      "n_estimators": 2635,
+      "num_leaves": 15,
+      "max_depth": -1,
+      "min_child_samples": 500,
+      "subsample": 0.8,
+      "subsample_freq": 1,
+      "colsample_bytree": 0.3,
+      "reg_alpha": 0.0,
+      "reg_lambda": 1.0,
+      "random_state": 42,
+      "n_jobs": 6,
+      "verbose": 0
+    },
+    "heavy_tail": "none",
+    "missing_indicators": "none"
+  },
+  "retained_sources": [
+    "bureau",
+    "previous",
+    "installments",
+    "credit_card",
+    "pos"
+  ],
+  "selection_file": "artifacts/metrics/relational_selection.json",
+  "data": {
+    "n_rows": 307511,
+    "n_application_features": 120,
+    "n_relational_features": 171,
+    "n_features": 291,
+    "preprocessing": {
+      "n_numeric": 275,
+      "n_categorical": 16,
+      "n_indicators": 0,
+      "n_features_out": 291,
+      "categorical_cardinality": {
+        "NAME_CONTRACT_TYPE": 2,
+        "CODE_GENDER": 3,
+        "FLAG_OWN_CAR": 2,
+        "FLAG_OWN_REALTY": 2,
+        "NAME_TYPE_SUITE": 7,
+        "NAME_INCOME_TYPE": 8,
+        "NAME_EDUCATION_TYPE": 5,
+        "NAME_FAMILY_STATUS": 6,
+        "NAME_HOUSING_TYPE": 6,
+        "OCCUPATION_TYPE": 18,
+        "WEEKDAY_APPR_PROCESS_START": 7,
+        "ORGANIZATION_TYPE": 58,
+        "FONDKAPREMONT_MODE": 4,
+        "HOUSETYPE_MODE": 3,
+        "WALLSMATERIAL_MODE": 7,
+        "EMERGENCYSTATE_MODE": 2
+      },
+      "heavy_tail": "none",
+      "heavy_tail_columns": [],
+      "clip_bounds": {},
+      "missing_indicators": "none",
+      "indicator_groups": [],
+      "float_dtype": "float32"
+    }
+  },
+  "split": {
+    "strategy": "frozen Milestone 1 stratified holdout, reloaded from the membership file",
+    "membership_file": "C:/Users/ricar/riskpilot-ai/data/processed/baseline_split_membership.csv",
+    "verified_against_reseeded_split": true,
+    "n_train": 246008,
+    "n_test": 61503,
+    "n_test_positive": 4965,
+    "prevalence_train": 0.08072908198107379,
+    "prevalence_test": 0.08072776937710356
+  },
+  "references": {
+    "logistic_regression": {
+      "model_reloaded_from_disk": true,
+      "model_path": "C:/Users/ricar/riskpilot-ai/artifacts/models/baseline_logistic_regression.joblib",
+      "recorded_metrics_available": true,
+      "split_verified_against_reseeded_split": true,
+      "n_test_matches": true,
+      "max_abs_metric_difference": 2.7755575615628914e-17,
+      "tolerance": 1e-06,
+      "metrics_match_recorded": true,
+      "recorded_test_metrics": {
+        "roc_auc": 0.7504123473248321,
+        "average_precision": 0.23531823859611234,
+        "log_loss": 0.24820499894091355,
+        "brier_score": 0.06821592765037675
+      }
+    },
+    "lightgbm": {
+      "model_reloaded_from_disk": true,
+      "model_path": "C:/Users/ricar/riskpilot-ai/artifacts/models/lightgbm_challenger.joblib",
+      "recorded_metrics_available": true,
+      "split_verified_against_reseeded_split": true,
+      "n_test_matches": true,
+      "max_abs_metric_difference": 0.0,
+      "tolerance": 1e-06,
+      "metrics_match_recorded": true,
+      "recorded_test_metrics": {
+        "roc_auc": 0.7622001575498403,
+        "average_precision": 0.25380570791039625,
+        "log_loss": 0.2445564646536432,
+        "brier_score": 0.06739081387345636
+      }
+    }
+  },
+  "model": {
+    "estimator": "LGBMClassifier",
+    "library_version": "4.7.0",
+    "n_trees": 2635,
+    "early_stopping": "none (rounds locked during selection)",
+    "fit_seconds": 102.28,
+    "predict_seconds_test": 2.966,
+    "n_features": 291,
+    "model_size_mb": 4.885,
+    "class_weight": null,
+    "n_jobs": 6
+  },
+  "metrics": {
+    "test": {
+      "n": 61503,
+      "n_positive": 4965,
+      "prevalence": 0.08072776937710356,
+      "roc_auc": 0.7900037251812958,
+      "average_precision": 0.29430722660736136,
+      "average_precision_prevalence_baseline": 0.08072776937710356,
+      "log_loss": 0.23535181801644292,
+      "log_loss_prevalence_baseline": 0.2805432489119303,
+      "brier_score": 0.06531596490502936,
+      "brier_prevalence_baseline": 0.07421079662850075,
+      "brier_skill_score": 0.11985899798379629,
+      "expected_calibration_error": 0.002321789279559197,
+      "calibration_slope": 1.0009650250444901,
+      "calibration_intercept": 0.0112540540874094,
+      "mean_predicted_probability": 0.08012466867928013,
+      "median_predicted_probability": 0.04583985830122887,
+      "max_predicted_probability": 0.8619633866665402
+    },
+    "train": {
+      "n": 246008,
+      "n_positive": 19860,
+      "prevalence": 0.08072908198107379,
+      "roc_auc": 0.8596613610661012,
+      "average_precision": 0.4276313720660032,
+      "average_precision_prevalence_baseline": 0.08072908198107379,
+      "log_loss": 0.2095763042022899,
+      "log_loss_prevalence_baseline": 0.2805464418090607,
+      "brier_score": 0.05913330550827601,
+      "brier_prevalence_baseline": 0.07421189730356685,
+      "brier_skill_score": 0.2031829442873726,
+      "expected_calibration_error": 0.018750004480916467,
+      "calibration_slope": 1.3820441906484353,
+      "calibration_intercept": 0.7213410177071894,
+      "mean_predicted_probability": 0.08074128516283614,
+      "median_predicted_probability": 0.04582944343127007,
+      "max_predicted_probability": 0.9284316141369607
+    }
+  },
+  "calibration_table_test": [
+    {
+      "bin": 0,
+      "lower": 0.0009280526098703939,
+      "upper": 0.013471257823695168,
+      "n": 6151,
+      "mean_predicted": 0.009629167090169826,
+      "observed_rate": 0.009754511461550968,
+      "gap": 0.0001253443713811423
+    },
+    {
+      "bin": 1,
+      "lower": 0.013471257823695168,
+      "upper": 0.01980154119587539,
+      "n": 6150,
+      "mean_predicted": 0.016628558196463573,
+      "observed_rate": 0.016260162601626018,
+      "gap": -0.00036839559483755474
+    },
+    {
+      "bin": 2,
+      "lower": 0.01980154119587539,
+      "upper": 0.02669518970943686,
+      "n": 6150,
+      "mean_predicted": 0.02316223424083727,
+      "observed_rate": 0.02113821138211382,
+      "gap": -0.0020240228587234503
+    },
+    {
+      "bin": 3,
+      "lower": 0.02669518970943686,
+      "upper": 0.03506619961824706,
+      "n": 6150,
+      "mean_predicted": 0.030693790376413493,
+      "observed_rate": 0.03105691056910569,
+      "gap": 0.00036312019269219703
+    },
+    {
+      "bin": 4,
+      "lower": 0.03506619961824706,
+      "upper": 0.04583985830122887,
+      "n": 6150,
+      "mean_predicted": 0.04017788304341871,
+      "observed_rate": 0.0391869918699187,
+      "gap": -0.0009908911735000137
+    },
+    {
+      "bin": 5,
+      "lower": 0.04583985830122887,
+      "upper": 0.06032594453765413,
+      "n": 6151,
+      "mean_predicted": 0.05260546264451029,
+      "observed_rate": 0.05039830921801333,
+      "gap": -0.002207153426496959
+    },
+    {
+      "bin": 6,
+      "lower": 0.06032594453765413,
+      "upper": 0.08135301236205118,
+      "n": 6150,
+      "mean_predicted": 0.07005735271767202,
+      "observed_rate": 0.06991869918699187,
+      "gap": -0.00013865353068015507
+    },
+    {
+      "bin": 7,
+      "lower": 0.08135301236205118,
+      "upper": 0.1168311124025293,
+      "n": 6150,
+      "mean_predicted": 0.0974750508027217,
+      "observed_rate": 0.10504065040650407,
+      "gap": 0.007565599603782364
+    },
+    {
+      "bin": 8,
+      "lower": 0.1168311124025293,
+      "upper": 0.19167561141271758,
+      "n": 6150,
+      "mean_predicted": 0.14855087249385393,
+      "observed_rate": 0.1551219512195122,
+      "gap": 0.006571078725658264
+    },
+    {
+      "bin": 9,
+      "lower": 0.19167561141271758,
+      "upper": 0.8619633866665402,
+      "n": 6151,
+      "mean_predicted": 0.3122445094740296,
+      "observed_rate": 0.3093805885221915,
+      "gap": -0.0028639209518380726
+    }
+  ],
+  "importance_by_source": [
+    {
+      "source": "application",
+      "n_features": 120,
+      "gain": 422546.02853536606,
+      "split": 14786,
+      "gain_share": 0.5334778562510574,
+      "split_share": 0.40081322851721335,
+      "features_used": 103,
+      "top_features_by_gain": "EXT_SOURCE_2, EXT_SOURCE_3, ORGANIZATION_TYPE"
+    },
+    {
+      "source": "bureau",
+      "n_features": 49,
+      "gain": 109076.16947340965,
+      "split": 6869,
+      "gain_share": 0.13771214762199868,
+      "split_share": 0.1862022228246137,
+      "features_used": 46,
+      "top_features_by_gain": "bureau__debt_to_credit_ratio, bureau__days_credit_max, bureau__days_credit_mean"
+    },
+    {
+      "source": "previous",
+      "n_features": 42,
+      "gain": 93246.09136843681,
+      "split": 5719,
+      "gain_share": 0.11772616843530546,
+      "split_share": 0.15502846299810247,
+      "features_used": 41,
+      "top_features_by_gain": "previous__credit_to_application_ratio_mean, previous__refusal_rate, previous__amt_annuity_approved_mean"
+    },
+    {
+      "source": "installments",
+      "n_features": 26,
+      "gain": 75627.10258054733,
+      "split": 4130,
+      "gain_share": 0.09548163237741185,
+      "split_share": 0.11195445920303605,
+      "features_used": 25,
+      "top_features_by_gain": "installments__late_rate_12m, installments__late_rate, installments__paid_sum"
+    },
+    {
+      "source": "credit_card",
+      "n_features": 34,
+      "gain": 45396.51323270798,
+      "split": 2469,
+      "gain_share": 0.05731454782477223,
+      "split_share": 0.06692870696665763,
+      "features_used": 32,
+      "top_features_by_gain": "credit_card__utilization_latest_mean, credit_card__over_limit_rate, credit_card__atm_drawing_month_rate"
+    },
+    {
+      "source": "pos",
+      "n_features": 20,
+      "gain": 46167.26574635506,
+      "split": 2917,
+      "gain_share": 0.058287647489454426,
+      "split_share": 0.0790729194903768,
+      "features_used": 19,
+      "top_features_by_gain": "pos__remaining_share_mean, pos__instalments_future_mean, pos__instalments_future_max"
+    }
+  ],
+  "artifacts": {
+    "figures": {
+      "roc_curve": "artifacts/figures/lightgbm_relational_roc_curve.png",
+      "precision_recall_curve": "artifacts/figures/lightgbm_relational_precision_recall_curve.png",
+      "calibration_curve": "artifacts/figures/lightgbm_relational_calibration_curve.png",
+      "probability_distribution": "artifacts/figures/lightgbm_relational_probability_distribution.png",
+      "roc_comparison": "artifacts/figures/relational_roc_comparison.png",
+      "precision_recall_comparison": "artifacts/figures/relational_precision_recall_comparison.png",
+      "calibration_comparison": "artifacts/figures/relational_calibration_comparison.png",
+      "probability_distributions": "artifacts/figures/relational_probability_distributions.png",
+      "delta_bootstrap": "artifacts/figures/relational_delta_bootstrap.png",
+      "ablation_validation": "artifacts/figures/relational_ablation_validation.png",
+      "importance_by_source": "artifacts/figures/relational_importance_by_source.png"
+    },
+    "model": "artifacts/models/lightgbm_relational.joblib",
+    "comparison_table": "artifacts/metrics/relational_model_comparison.csv",
+    "bootstrap": "artifacts/metrics/relational_bootstrap.json",
+    "importance": "artifacts/metrics/relational_importance_by_source.csv",
+    "test_predictions": "data/processed/relational_test_predictions.csv"
+  }
+}
