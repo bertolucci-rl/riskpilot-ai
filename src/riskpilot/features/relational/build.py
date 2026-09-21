@@ -10,9 +10,9 @@ aggregated to one row per ``SK_ID_CURR``, verified, and written to
 ``data/processed/relational/<source>.parquet`` (git-ignored, reproducible).
 A build log (``relational_build_log.json``, kept in ``data/processed/relational``
 and copied to ``artifacts/metrics``) records for every source the raw-file
-signature, input rows, output customers, feature count, run time and output
-size; a source is rebuilt only when its raw files changed, when ``--force`` is
-given, or when the cached table is missing. The data-quality audit of every
+content hashes, builder/policy versions, schema, grain, input rows, feature count,
+run time and output size. Legacy, corrupt or mismatched manifests trigger a
+rebuild; ``--force`` also rebuilds matching caches. The data-quality audit of every
 source is written to ``artifacts/metrics/relational_data_audit.json`` and the
 feature catalog to ``artifacts/metrics/relational_feature_catalog.csv``.
 """
@@ -39,6 +39,7 @@ from riskpilot.features.relational.assemble import (
     table_path,
 )
 from riskpilot.features.relational.common import ID
+from riskpilot.features.relational.provenance import raw_signature, register_cache, validated_cache
 
 logger = logging.getLogger(__name__)
 
@@ -56,20 +57,6 @@ def _display(path: Path) -> str:
         return path.resolve().relative_to(config.PROJECT_ROOT).as_posix()
     except ValueError:
         return path.as_posix()
-
-
-def raw_signature(source: str, raw_dir: Path) -> dict[str, dict[str, Any]]:
-    """Size and modification time of every raw file a source depends on."""
-    out = {}
-    for table in RAW_FILES[source]:
-        path = raw_dir / config.RELATIONAL_TABLES[table]["filename"]
-        stat = path.stat() if path.is_file() else None
-        out[table] = {
-            "file": path.name,
-            "size_bytes": stat.st_size if stat else None,
-            "mtime": stat.st_mtime if stat else None,
-        }
-    return out
 
 
 def load_log(processed_dir: Path) -> dict[str, Any]:
@@ -91,10 +78,13 @@ def save_log(log: dict[str, Any], processed_dir: Path, metrics_dir: Path | None)
 def is_cached(
     source: str, log: dict[str, Any], *, raw_dir: Path, processed_dir: Path, nrows: int | None
 ) -> bool:
-    entry = log["sources"].get(source)
-    if entry is None or not table_path(source, processed_dir).is_file():
+    if source not in log.get("sources", {}):
         return False
-    return entry.get("raw_files") == raw_signature(source, raw_dir) and entry.get("nrows") == nrows
+    try:
+        validated_cache(source, table_path(source, processed_dir), raw_dir=raw_dir, nrows=nrows)
+    except ValueError:
+        return False
+    return True
 
 
 def build_source(
@@ -113,8 +103,10 @@ def build_source(
     processed_dir.mkdir(parents=True, exist_ok=True)
     path = table_path(source, processed_dir)
     features.to_parquet(path, index=False)
+    manifest = register_cache(source, path, features, raw_dir=raw_dir, nrows=nrows)
     seconds = time.perf_counter() - started
     entry = {
+        "cache_provenance": {k: v for k, v in manifest.items() if k != "raw_dir"},
         "built_at_utc": datetime.now(UTC).isoformat(timespec="seconds"),
         "riskpilot_version": __version__,
         "raw_files": raw_signature(source, raw_dir),

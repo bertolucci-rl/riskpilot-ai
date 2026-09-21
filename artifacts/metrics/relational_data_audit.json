@@ -116,7 +116,7 @@
       "debt_exceeds_credit_sum_rows": 29642,
       "negative_debt_rows_clipped": 8418,
       "negative_limit_rows_clipped": 351,
-      "positive_days_credit_update_rows_clipped": 17,
+      "positive_days_credit_update_snapshots_masked": 17,
       "active_with_past_enddate_rows": 76359
     },
     "bureau_balance": {

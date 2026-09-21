@@ -30,6 +30,7 @@ from riskpilot.features.relational.common import (
     safe_ratio,
     value_counts_dict,
 )
+from riskpilot.features.relational.temporal import require_historical
 
 SOURCE = "credit_card"
 PREFIX = "credit_card"
@@ -144,6 +145,7 @@ SPECS: list[FeatureSpec] = [
 
 
 def build_credit_card_features(cc: pd.DataFrame) -> pd.DataFrame:
+    require_historical(cc, "MONTHS_BALANCE")
     c = cc.copy(deep=False)
     balance_nonneg = c["AMT_BALANCE"].clip(lower=0)
     c["utilization"] = safe_ratio(balance_nonneg, c["AMT_CREDIT_LIMIT_ACTUAL"])

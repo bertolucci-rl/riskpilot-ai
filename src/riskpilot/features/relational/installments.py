@@ -38,6 +38,7 @@ from riskpilot.features.relational.common import (
     read_raw_table,
     safe_ratio,
 )
+from riskpilot.features.relational.temporal import require_historical
 
 SOURCE = "installments"
 PREFIX = "installments"
@@ -137,6 +138,7 @@ SPECS: list[FeatureSpec] = [
 
 def installment_level(rows: pd.DataFrame) -> pd.DataFrame:
     """Sum payment parts to one row per installment and derive behaviour columns."""
+    require_historical(rows, "DAYS_INSTALMENT", "DAYS_ENTRY_PAYMENT")
     g = rows.groupby(INSTALLMENT_KEY, sort=False)
     inst = g.agg(
         SK_ID_CURR=("SK_ID_CURR", "first"),

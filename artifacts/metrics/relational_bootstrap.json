@@ -75,32 +75,32 @@
     },
     "lightgbm_relational": {
       "roc_auc": {
-        "estimate": 0.7900037251812958,
-        "ci_low": 0.7832936218168585,
-        "ci_high": 0.7964096103753813,
-        "bootstrap_mean": 0.7900394281653046,
-        "bootstrap_sd": 0.0034249431216828905
+        "estimate": 0.7899810399422296,
+        "ci_low": 0.7832658472262793,
+        "ci_high": 0.7963435889903129,
+        "bootstrap_mean": 0.7900110726970997,
+        "bootstrap_sd": 0.0034150661375527518
       },
       "average_precision": {
-        "estimate": 0.29430722660736136,
-        "ci_low": 0.28169279936616654,
-        "ci_high": 0.3077800780311099,
-        "bootstrap_mean": 0.2946310414483709,
-        "bootstrap_sd": 0.006820146701293513
+        "estimate": 0.29483454853746416,
+        "ci_low": 0.2822828349420103,
+        "ci_high": 0.3080761692264072,
+        "bootstrap_mean": 0.2951194192861478,
+        "bootstrap_sd": 0.006786495539892076
       },
       "log_loss": {
-        "estimate": 0.23535181801644292,
-        "ci_low": 0.23093139217846176,
-        "ci_high": 0.24010241248507366,
-        "bootstrap_mean": 0.23536019865657573,
-        "bootstrap_sd": 0.0023811440556285464
+        "estimate": 0.23532469484284183,
+        "ci_low": 0.2309012579025952,
+        "ci_high": 0.24005143431974024,
+        "bootstrap_mean": 0.23533678524862653,
+        "bootstrap_sd": 0.0023797010187079047
       },
       "brier_score": {
-        "estimate": 0.06531596490502936,
-        "ci_low": 0.0639018717229173,
-        "ci_high": 0.06689551304301164,
-        "bootstrap_mean": 0.06532133708462866,
-        "bootstrap_sd": 0.0007691539111611284
+        "estimate": 0.06530621104827788,
+        "ci_low": 0.06389982924802345,
+        "ci_high": 0.06690738781812254,
+        "bootstrap_mean": 0.06531268043884773,
+        "bootstrap_sd": 0.0007686473959100204
       }
     }
   },
@@ -149,38 +149,38 @@
       "model": "lightgbm_relational",
       "reference": "lightgbm",
       "roc_auc": {
-        "estimate": 0.027803567631455528,
-        "ci_low": 0.02380361570049631,
-        "ci_high": 0.03157564692776964,
-        "bootstrap_mean": 0.02789752014605459,
-        "bootstrap_sd": 0.002000695883009539,
+        "estimate": 0.027780882392389294,
+        "ci_low": 0.02387202053360302,
+        "ci_high": 0.031515033290954286,
+        "bootstrap_mean": 0.02786916467784988,
+        "bootstrap_sd": 0.0020108005082556126,
         "fraction_improving": 1.0,
         "ci_excludes_zero": true
       },
       "average_precision": {
-        "estimate": 0.04050151869696511,
-        "ci_low": 0.03318905032115035,
-        "ci_high": 0.048226310770612374,
-        "bootstrap_mean": 0.040780582109565096,
-        "bootstrap_sd": 0.003877649728602729,
+        "estimate": 0.04102884062706791,
+        "ci_low": 0.03373747391888142,
+        "ci_high": 0.04869010259175454,
+        "bootstrap_mean": 0.041268959947342074,
+        "bootstrap_sd": 0.0038535561994590952,
         "fraction_improving": 1.0,
         "ci_excludes_zero": true
       },
       "log_loss": {
-        "estimate": -0.009204646637200276,
-        "ci_low": -0.010454423222917187,
-        "ci_high": -0.007972514392033924,
-        "bootstrap_mean": -0.009245324437276355,
-        "bootstrap_sd": 0.0006217336862675885,
+        "estimate": -0.009231769810801371,
+        "ci_low": -0.010474664481157591,
+        "ci_high": -0.00803737729290114,
+        "bootstrap_mean": -0.00926873784522553,
+        "bootstrap_sd": 0.0006212521632504577,
         "fraction_improving": 1.0,
         "ci_excludes_zero": true
       },
       "brier_score": {
-        "estimate": -0.0020748489684269955,
-        "ci_low": -0.002418475255456318,
-        "ci_high": -0.001744070837904916,
-        "bootstrap_mean": -0.002086440254202157,
-        "bootstrap_sd": 0.00017391914187252957,
+        "estimate": -0.002084602825178472,
+        "ci_low": -0.0024328059963942203,
+        "ci_high": -0.0017529643451877767,
+        "bootstrap_mean": -0.0020950968999830736,
+        "bootstrap_sd": 0.00017211354507233793,
         "fraction_improving": 1.0,
         "ci_excludes_zero": true
       }
@@ -189,47 +189,47 @@
       "model": "lightgbm_relational",
       "reference": "logistic_regression",
       "roc_auc": {
-        "estimate": 0.039591377856463716,
-        "ci_low": 0.03530274470336406,
-        "ci_high": 0.04408529597401552,
-        "bootstrap_mean": 0.039709531545756106,
-        "bootstrap_sd": 0.002279447191797379,
+        "estimate": 0.03956869261739748,
+        "ci_low": 0.03532308322363121,
+        "ci_high": 0.04415306351178642,
+        "bootstrap_mean": 0.0396811760775514,
+        "bootstrap_sd": 0.002292589697792634,
         "fraction_improving": 1.0,
         "ci_excludes_zero": true
       },
       "average_precision": {
-        "estimate": 0.05898898801124902,
-        "ci_low": 0.0505366093332264,
-        "ci_high": 0.06862302300675743,
-        "bootstrap_mean": 0.05914592553026561,
-        "bootstrap_sd": 0.004432190072480311,
+        "estimate": 0.05951630994135182,
+        "ci_low": 0.05113785762728264,
+        "ci_high": 0.06863230448337719,
+        "bootstrap_mean": 0.059634303368042596,
+        "bootstrap_sd": 0.0044040524466885346,
         "fraction_improving": 1.0,
         "ci_excludes_zero": true
       },
       "log_loss": {
-        "estimate": -0.012853180924470603,
-        "ci_low": -0.014294346532003574,
-        "ci_high": -0.011500542980429445,
-        "bootstrap_mean": -0.012894462583698892,
-        "bootstrap_sd": 0.0007092792956470625,
+        "estimate": -0.012880304098071699,
+        "ci_low": -0.014314846398220067,
+        "ci_high": -0.011537881824506428,
+        "bootstrap_mean": -0.012917875991648068,
+        "bootstrap_sd": 0.0007104136830297064,
         "fraction_improving": 1.0,
         "ci_excludes_zero": true
       },
       "brier_score": {
-        "estimate": -0.002899962745347387,
-        "ci_low": -0.0033107625610992127,
-        "ci_high": -0.002522202524355761,
-        "bootstrap_mean": -0.0029105546946247216,
-        "bootstrap_sd": 0.00019936611113105155,
+        "estimate": -0.0029097166020988635,
+        "ci_low": -0.003313126795478605,
+        "ci_high": -0.002528668970806947,
+        "bootstrap_mean": -0.0029192113404056387,
+        "bootstrap_sd": 0.00019787163571980673,
         "fraction_improving": 1.0,
         "ci_excludes_zero": true
       }
     }
   },
   "run": {
-    "timestamp_utc": "2026-09-17T23:46:47+00:00",
+    "timestamp_utc": "2026-09-21T18:08:58+00:00",
     "riskpilot_version": "0.1.0",
     "lightgbm_version": "4.7.0",
-    "total_seconds": 208.9
+    "total_seconds": 332.6
   }
 }

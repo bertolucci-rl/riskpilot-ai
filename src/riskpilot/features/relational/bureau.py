@@ -8,15 +8,10 @@ in [-96, 0] relative to the current application. Only 774,354 of the
 credits have no row in ``bureau`` and are dropped by the validated
 many-to-one merge (a documented discrepancy of the dataset).
 
-Temporal semantics (official column dictionary): every ``DAYS_*`` column is
-"relative to the current application"; ``DAYS_CREDIT``, ``DAYS_ENDDATE_FACT``
-and ``DAYS_CREDIT_UPDATE`` describe the past (``<= 0``; 17 rows of
-``DAYS_CREDIT_UPDATE`` are slightly positive and are clipped to 0),
-``DAYS_CREDIT_ENDDATE`` is the *remaining* planned duration at application
-time (positive for credits that end later, which is known at application),
-and the amounts and ``CREDIT_DAY_OVERDUE`` are "at the time of application".
-Nothing in either table postdates the application, so every feature here is
-historical information available at decision time.
+Temporal policy: dated historical origination facts remain available, but an
+undated or post-application snapshot contributes no status, amount or updated
+contractual terms. Positive planned maturity is allowed in eligible snapshots.
+Monthly observations must be at or before application. See ``temporal.py``.
 
 Pipeline: aggregate ``bureau_balance`` to one row per ``SK_ID_BUREAU``, merge
 that summary into ``bureau`` (many-to-one, validated), then aggregate to one
@@ -40,13 +35,17 @@ from riskpilot.features.relational.common import (
     safe_ratio,
     value_counts_dict,
 )
+from riskpilot.features.relational.temporal import (
+    historical_rows,
+    sanitize_bureau_temporal_fields,
+)
 
 SOURCE = "bureau"
 PREFIX = "bureau"
 LEAKAGE = (
-    "safe: DAYS_* are relative to the current application (<= 0 except the planned "
-    "DAYS_CREDIT_ENDDATE), amounts/overdue are 'at the time of application', "
-    "bureau_balance months are in [-96, 0]"
+    "conditional: historical origination/type retained; snapshot fields masked when "
+    "update is future/missing or realized closure is future; planned maturity may be "
+    "positive in an eligible snapshot; bureau_balance observations require month <= 0"
 )
 
 BUREAU_USECOLS = [
@@ -106,7 +105,9 @@ SPECS: list[FeatureSpec] = [
     FeatureSpec("active_count", "counts", "credits with CREDIT_ACTIVE == Active", "count", True),
     FeatureSpec("closed_count", "counts", "credits with CREDIT_ACTIVE == Closed", "count", True),
     FeatureSpec("sold_or_bad_count", "counts", "credits Sold or Bad debt", "count", True),
-    FeatureSpec("active_ratio", "counts", "active credits / all credits", "ratio"),
+    FeatureSpec(
+        "active_ratio", "counts", "active credits / credits with eligible observed status", "ratio"
+    ),
     FeatureSpec("n_credit_types", "counts", "distinct CREDIT_TYPE values", "nunique", True),
     FeatureSpec("consumer_count", "credit types", "Consumer credit records", "count", True),
     FeatureSpec("credit_card_count", "credit types", "Credit card records", "count", True),
@@ -165,7 +166,7 @@ SPECS: list[FeatureSpec] = [
     FeatureSpec("days_credit_min", "recency", "DAYS_CREDIT of the oldest credit", "min"),
     FeatureSpec("days_credit_mean", "recency", "mean DAYS_CREDIT", "mean"),
     FeatureSpec(
-        "days_update_max", "recency", "most recent DAYS_CREDIT_UPDATE (clipped <= 0)", "max"
+        "days_update_max", "recency", "most recent eligible DAYS_CREDIT_UPDATE (<= 0)", "max"
     ),
     FeatureSpec(
         "enddate_remaining_max",
@@ -231,7 +232,7 @@ SPECS: list[FeatureSpec] = [
 
 def aggregate_bureau_balance(balance: pd.DataFrame) -> pd.DataFrame:
     """One row per ``SK_ID_BUREAU`` from the monthly status records."""
-    b = balance
+    b = historical_rows(balance, "MONTHS_BALANCE")
     severity = b["STATUS"].astype(str).map(DPD_SEVERITY).fillna(0).astype("int8")
     known = ~b["STATUS"].isin(["X"])
     frame = pd.DataFrame(
@@ -268,19 +269,32 @@ def aggregate_bureau_balance(balance: pd.DataFrame) -> pd.DataFrame:
 
 def build_bureau_features(bureau: pd.DataFrame, balance: pd.DataFrame | None) -> pd.DataFrame:
     """One row per ``SK_ID_CURR`` from ``bureau`` (+ optional ``bureau_balance``)."""
-    b = bureau.copy(deep=False)
+    if not bureau["SK_ID_BUREAU"].is_unique:
+        raise ValueError("bureau must have unique SK_ID_BUREAU.")
+    b = sanitize_bureau_temporal_fields(bureau)
     b["debt"] = b["AMT_CREDIT_SUM_DEBT"].clip(lower=0)
     b["limit"] = b["AMT_CREDIT_SUM_LIMIT"].clip(lower=0)
-    b["is_active"] = (b["CREDIT_ACTIVE"] == "Active").astype("int8")
-    b["is_closed"] = (b["CREDIT_ACTIVE"] == "Closed").astype("int8")
-    b["is_sold_or_bad"] = b["CREDIT_ACTIVE"].isin(["Sold", "Bad debt"]).astype("int8")
-    b["active_debt"] = b["debt"].where(b["is_active"] == 1, 0.0)
+    b["is_active"] = (
+        (b["CREDIT_ACTIVE"] == "Active").astype("float32").where(b["CREDIT_ACTIVE"].notna())
+    )
+    b["is_closed"] = (
+        (b["CREDIT_ACTIVE"] == "Closed").astype("float32").where(b["CREDIT_ACTIVE"].notna())
+    )
+    b["is_sold_or_bad"] = (
+        b["CREDIT_ACTIVE"]
+        .isin(["Sold", "Bad debt"])
+        .astype("float32")
+        .where(b["CREDIT_ACTIVE"].notna())
+    )
+    b["active_debt"] = b["debt"].where(b["is_active"] == 1, 0.0).where(b["is_active"].notna())
     type_group = b["CREDIT_TYPE"].astype(str).map(CREDIT_TYPE_GROUPS).fillna("other")
     for group in [*CREDIT_TYPE_GROUPS.values(), "other"]:
         b[f"type_{group}"] = (type_group == group).astype("int8")
     b["recent_credit"] = (b["DAYS_CREDIT"] >= -RECENT_DAYS).astype("int8")
-    b["overdue_credit"] = (b["CREDIT_DAY_OVERDUE"] > 0).astype("int8")
-    b["days_update"] = b["DAYS_CREDIT_UPDATE"].clip(upper=0)
+    b["overdue_credit"] = (
+        (b["CREDIT_DAY_OVERDUE"] > 0).astype("float32").where(b["CREDIT_DAY_OVERDUE"].notna())
+    )
+    b["days_update"] = b["DAYS_CREDIT_UPDATE"]
     b["active_enddate"] = b["DAYS_CREDIT_ENDDATE"].where(b["is_active"] == 1)
 
     if balance is not None and len(balance):
@@ -354,7 +368,22 @@ def build_bureau_features(bureau: pd.DataFrame, balance: pd.DataFrame | None) ->
             "bb_closed_share_mean": ("bb_closed_share", "mean"),
         },
     )
-    out["active_ratio"] = safe_ratio(out["active_count"], out["credit_count"])
+    out["active_ratio"] = b.groupby(ID, sort=False)["is_active"].mean()
+    # A customer with only unavailable snapshots has unknown amounts/status,
+    # not zero debt or zero delinquency. Dated origination/monthly facts survive.
+    unavailable = b.groupby(ID, sort=False)["DAYS_CREDIT_UPDATE"].count().eq(0)
+    historical = {
+        "credit_count",
+        "n_credit_types",
+        "credits_last_year",
+        "days_credit_max",
+        "days_credit_min",
+        "days_credit_mean",
+        *[f"{g}_count" for g in CREDIT_TYPE_GROUPS.values()],
+        "other_type_count",
+    }
+    snapshot_columns = [c for c in out if c not in historical and not c.startswith("bb_")]
+    out.loc[unavailable, snapshot_columns] = np.nan
     out["debt_to_credit_ratio"] = safe_ratio(out["debt_sum_total"], out["credit_sum_total"])
     out["overdue_to_debt_ratio"] = safe_ratio(out["overdue_sum_total"], out["debt_sum_total"])
     return finalize_customer_table(out, prefix=PREFIX, specs=SPECS)
@@ -400,7 +429,7 @@ def audit_bureau(bureau: pd.DataFrame, balance: pd.DataFrame | None) -> dict[str
             ),
             "negative_debt_rows_clipped": int((bureau["AMT_CREDIT_SUM_DEBT"] < 0).sum()),
             "negative_limit_rows_clipped": int((bureau["AMT_CREDIT_SUM_LIMIT"] < 0).sum()),
-            "positive_days_credit_update_rows_clipped": int(
+            "positive_days_credit_update_snapshots_masked": int(
                 (bureau["DAYS_CREDIT_UPDATE"] > 0).sum()
             ),
             "active_with_past_enddate_rows": int(

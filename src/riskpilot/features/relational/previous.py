@@ -31,6 +31,7 @@ from riskpilot.features.relational.common import (
     safe_ratio,
     value_counts_dict,
 )
+from riskpilot.features.relational.temporal import require_historical
 
 SOURCE = "previous"
 PREFIX = "previous"
@@ -188,6 +189,7 @@ SPECS: list[FeatureSpec] = [
 
 def build_previous_features(prev: pd.DataFrame) -> pd.DataFrame:
     """One row per ``SK_ID_CURR`` from ``previous_application``."""
+    require_historical(prev, "DAYS_DECISION")
     p = prev.copy(deep=False)
     status = p["NAME_CONTRACT_STATUS"].astype(str)
     p["approved"] = (status == "Approved").astype("int8")

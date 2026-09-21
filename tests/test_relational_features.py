@@ -42,7 +42,7 @@ def bureau_frames():
             "AMT_CREDIT_SUM_DEBT": [400.0, -20.0, 1500.0],
             "AMT_CREDIT_SUM_LIMIT": [0.0, 100.0, -5.0],
             "AMT_CREDIT_SUM_OVERDUE": [10.0, 0.0, 0.0],
-            "DAYS_CREDIT_UPDATE": [-10.0, 20.0, -5.0],
+            "DAYS_CREDIT_UPDATE": [-10.0, -20.0, -5.0],
             "AMT_ANNUITY": [50.0, np.nan, 100.0],
         }
     )
@@ -84,7 +84,7 @@ def test_bureau_features(bureau_frames):
     assert out.loc[100, "bureau__limit_sum"] == pytest.approx(100.0)
     assert out.loc[100, "bureau__debt_to_credit_ratio"] == pytest.approx(400 / 1500)
     assert out.loc[100, "bureau__overdue_to_debt_ratio"] == pytest.approx(10 / 400)
-    assert out.loc[100, "bureau__days_update_max"] == 0.0  # +20 clipped to 0
+    assert out.loc[100, "bureau__days_update_max"] == -10.0  # most recent eligible update
     assert out.loc[100, "bureau__enddate_remaining_max"] == 300.0  # only the active credit
     assert out.loc[100, "bureau__credits_last_year"] == 1
     assert out.loc[100, "bureau__bb_credits_with_history"] == 1
@@ -407,7 +407,7 @@ def test_feature_catalog_matches_generated_columns(tables):
         "leakage_assessment",
     } <= set(catalog.columns)
     assert catalog["description"].str.len().gt(5).all()
-    assert catalog["leakage_assessment"].str.startswith("safe").all()
+    assert catalog["leakage_assessment"].str.startswith(("safe", "conditional")).all()
 
 
 def test_feature_source_mapping():
@@ -497,3 +497,144 @@ def test_build_cli_builds_caches_and_writes_artifacts(tiny_raw_dir, tmp_path, ca
         and matrix.loc[1, "pos__has_history"] == 0.0
         and matrix.loc[0, "pos__n_months"] == 4.0
     )
+
+
+@pytest.mark.parametrize("update", [1.0, 372.0, np.nan])
+def test_future_or_undated_bureau_snapshot_retains_only_historical_facts(bureau_frames, update):
+    from riskpilot.features.relational.temporal import sanitize_bureau_temporal_fields
+
+    b, bb = bureau_frames
+    b.loc[0, "DAYS_CREDIT_UPDATE"] = update
+    original = b.copy(deep=True)
+    clean = sanitize_bureau_temporal_fields(b)
+    assert clean.loc[0, "DAYS_CREDIT"] == -100
+    assert clean.loc[0, "CREDIT_TYPE"] == "Consumer credit"
+    assert pd.isna(clean.loc[0, "CREDIT_ACTIVE"])
+    assert pd.isna(clean.loc[0, "AMT_CREDIT_SUM_DEBT"])
+    assert pd.isna(clean.loc[0, "DAYS_CREDIT_ENDDATE"])
+    pd.testing.assert_frame_equal(b, original)
+    out = bureau.build_bureau_features(b, bb).set_index(ID)
+    assert out.index.is_unique
+    assert out.loc[100, "bureau__credit_count"] == 2
+    assert out.loc[100, "bureau__credit_sum_total"] == 500  # eligible other credit only
+    assert out.loc[100, "bureau__active_ratio"] == 0  # closed, other status unknown
+    assert out.loc[100, "bureau__bb_months_sum"] == 4  # independently dated months
+    assert out.loc[100, "bureau__days_update_max"] == -20
+
+
+def test_bureau_boundary_contractual_maturity_and_future_closure(bureau_frames):
+    from riskpilot.features.relational.temporal import sanitize_bureau_temporal_fields
+
+    b, _ = bureau_frames
+    b.loc[0, ["DAYS_CREDIT", "DAYS_CREDIT_UPDATE"]] = 0
+    clean = sanitize_bureau_temporal_fields(b)
+    assert clean.loc[0, "DAYS_CREDIT_ENDDATE"] == 300  # known future contractual term
+    assert clean.loc[0, "AMT_CREDIT_SUM_DEBT"] == 400
+    b.loc[0, "DAYS_ENDDATE_FACT"] = 1
+    clean = sanitize_bureau_temporal_fields(b)
+    assert pd.isna(clean.loc[0, "AMT_CREDIT_SUM_DEBT"])
+    assert pd.isna(clean.loc[0, "DAYS_ENDDATE_FACT"])
+    assert clean.loc[0, "DAYS_CREDIT"] == 0
+
+
+@pytest.mark.parametrize("origin", [1.0, np.nan])
+def test_bureau_without_historical_origination_is_excluded(bureau_frames, origin):
+    b, bb = bureau_frames
+    b.loc[2, "DAYS_CREDIT"] = origin
+    out = bureau.build_bureau_features(b, bb)
+    assert list(out[ID]) == [100]
+
+
+def test_only_unsafe_bureau_snapshot_is_unknown_not_zero(bureau_frames):
+    b, bb = bureau_frames
+    b.loc[2, "DAYS_CREDIT_UPDATE"] = 10
+    out = bureau.build_bureau_features(b, bb).set_index(ID)
+    assert out.loc[200, "bureau__credit_count"] == 1
+    assert pd.isna(out.loc[200, "bureau__debt_sum_total"])
+    assert pd.isna(out.loc[200, "bureau__sold_or_bad_count"])
+    assert out.loc[200, "bureau__bb_severe_credits"] == 1
+
+
+def test_future_bureau_month_not_used(bureau_frames):
+    b, bb = bureau_frames
+    future = bb.iloc[[0]].copy()
+    future["MONTHS_BALANCE"] = 1
+    future["STATUS"] = "5"
+    pd.testing.assert_frame_equal(
+        bureau.build_bureau_features(b, bb),
+        bureau.build_bureau_features(b, pd.concat([bb, future], ignore_index=True)),
+    )
+
+
+@pytest.mark.parametrize("kind", ["policy", "schema", "source", "corrupt", "missing", "grain"])
+def test_cache_rejects_stale_or_corrupt_artifacts(tiny_raw_dir, tmp_path, kind):
+    from riskpilot.features.relational.provenance import file_hash, validated_cache
+
+    folder = tmp_path / "cache"
+    build_mod.build_all(["bureau"], raw_dir=tiny_raw_dir, processed_dir=folder, metrics_dir=None)
+    path = folder / "bureau.parquet"
+    expected = validated_cache("bureau", path)
+    manifest_path = path.with_suffix(".manifest.json")
+    manifest = json.loads(manifest_path.read_text())
+    if kind == "policy":
+        manifest["builder"]["temporal_policy"] = "pre-repair"
+    elif kind == "schema":
+        changed = expected.rename(columns={expected.columns[1]: "wrong_feature"})
+        changed.to_parquet(path, index=False)
+        manifest["sha256"] = file_hash(path)  # checksum alone is insufficient
+    elif kind == "source":
+        import os
+
+        raw = tiny_raw_dir / "bureau.csv"
+        stat = raw.stat()
+        original = raw.read_bytes()
+        changed = original.replace(b"1000.0", b"9000.0", 1)
+        assert changed != original and len(changed) == len(original)
+        raw.write_bytes(changed)
+        os.utime(raw, ns=(stat.st_atime_ns, stat.st_mtime_ns))
+    elif kind == "corrupt":
+        path.write_bytes(b"incomplete parquet")
+    elif kind == "missing":
+        manifest = {}
+    else:
+        pd.concat([expected, expected.iloc[[0]]]).to_parquet(path, index=False)
+        manifest["sha256"] = file_hash(path)
+    manifest_path.write_text(json.dumps(manifest))
+    with pytest.raises(ValueError, match="Invalid bureau cache"):
+        validated_cache("bureau", path)
+    assert not build_mod.is_cached(
+        "bureau",
+        {"sources": {"bureau": {}}},
+        raw_dir=tiny_raw_dir,
+        processed_dir=folder,
+        nrows=None,
+    )
+
+
+def test_other_sources_fail_closed_on_new_future_observations(
+    previous_frame,
+    installment_rows,
+    credit_card_frame,
+    pos_frame,
+):
+    cases = [
+        (previous.build_previous_features, previous_frame, "DAYS_DECISION"),
+        (installments.build_installments_features, installment_rows, "DAYS_ENTRY_PAYMENT"),
+        (credit_card.build_credit_card_features, credit_card_frame, "MONTHS_BALANCE"),
+        (pos_cash.build_pos_features, pos_frame, "MONTHS_BALANCE"),
+    ]
+    for builder, frame, column in cases:
+        changed = frame.copy()
+        changed.loc[0, column] = 1
+        with pytest.raises(ValueError, match="Post-application"):
+            builder(changed)
+
+
+def test_catalog_distinguishes_origin_snapshot_and_monthly_semantics():
+    catalog = assemble.feature_catalog().set_index("feature")
+    assert "origination <= 0" in catalog.loc["bureau__credit_count", "temporal_interpretation"]
+    assert "masks amounts" in catalog.loc["bureau__debt_sum_total", "temporal_interpretation"]
+    assert (
+        "observation <= month 0" in catalog.loc["bureau__bb_months_sum", "temporal_interpretation"]
+    )
+    assert catalog["temporal_interpretation"].notna().all()

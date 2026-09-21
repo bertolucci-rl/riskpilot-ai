@@ -27,6 +27,7 @@ from riskpilot.features.relational.common import (
     safe_ratio,
     value_counts_dict,
 )
+from riskpilot.features.relational.temporal import require_historical
 
 SOURCE = "pos"
 PREFIX = "pos"
@@ -87,6 +88,7 @@ SPECS: list[FeatureSpec] = [
 
 
 def build_pos_features(pos: pd.DataFrame) -> pd.DataFrame:
+    require_historical(pos, "MONTHS_BALANCE")
     p = pos.copy(deep=False)
     p["dpd_pos"] = (p["SK_DPD"] > 0).astype(FLOAT)
     p["dpd_severe"] = (p["SK_DPD"] > SEVERE_DPD_DAYS).astype(FLOAT)

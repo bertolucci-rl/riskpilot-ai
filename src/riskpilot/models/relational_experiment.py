@@ -51,6 +51,11 @@ from matplotlib.figure import Figure
 
 from riskpilot import __version__, config
 from riskpilot.features.relational import assemble
+from riskpilot.features.relational.provenance import (
+    save_checkpoint,
+    validate_checkpoint,
+    write_json,
+)
 from riskpilot.models import challengers as ch
 from riskpilot.models import comparison
 from riskpilot.models.evaluate import (
@@ -65,6 +70,7 @@ from riskpilot.models.evaluate import (
     save_metrics,
     use_headless_backend,
 )
+from riskpilot.models.relational_integrity import CheckpointTrialLog, training_context
 from riskpilot.models.train import _display_path, make_split
 
 logger = logging.getLogger(__name__)
@@ -213,6 +219,7 @@ class AblationConfig:
 
     def to_dict(self) -> dict[str, Any]:
         out = asdict(self)
+        out["sources"] = list(self.sources)
         out["retune_axes"] = [[axis, list(values)] for axis, values in self.retune_axes]
         return out
 
@@ -439,6 +446,10 @@ def run_ablation_stage(
     membership["internal_split"] = "fit"
     membership.loc[X_valid.index, "internal_split"] = "validation"
     paths.processed_dir.mkdir(parents=True, exist_ok=True)
+    if resume and paths.internal_membership_path.exists():
+        recorded = pd.read_csv(paths.internal_membership_path)
+        if not recorded.equals(membership.reset_index(drop=True)):
+            raise ValueError("Internal membership differs; cannot resume.")
     membership.to_csv(paths.internal_membership_path, index=False)
     logger.info(
         "Internal split: fit=%d (prev %.4f) | validation=%d (prev %.4f) -> %s",
@@ -460,14 +471,24 @@ def run_ablation_stage(
         full.memory_usage(deep=True).sum() / 1e6,
         {k: round(v, 3) for k, v in coverage.items()},
     )
+    context = training_context(X_train, y_train, ids_train, paths, cfg)
+    checkpoint = paths.ablation_path.with_suffix(".checkpoint.json")
+    checkpoint_files = [
+        paths.ablation_path,
+        paths.validation_predictions_path,
+        paths.internal_membership_path,
+    ]
     fit_index, valid_index = X_fit.index, X_valid.index
     del X_fit, X_valid
 
     records: dict[str, dict[str, Any]] = {}
     predictions: dict[str, np.ndarray] = {}
-    if resume and paths.ablation_path.is_file() and paths.validation_predictions_path.is_file():
+    if resume and (paths.ablation_path.exists() or paths.validation_predictions_path.exists()):
+        validate_checkpoint(checkpoint, context, checkpoint_files)
         old = pd.read_csv(paths.ablation_path)
         old_pred = pd.read_parquet(paths.validation_predictions_path)
+        if not old_pred.index.equals(valid_index):
+            raise ValueError("Validation membership/order mismatch in cached predictions.")
         if len(old_pred) == len(valid_index):
             for row in old.to_dict(orient="records"):
                 name = row["configuration"]
@@ -511,6 +532,7 @@ def run_ablation_stage(
     def persist() -> None:
         pd.DataFrame(list(records.values())).to_csv(paths.ablation_path, index=False)
         pd.DataFrame(predictions, index=valid_index).to_parquet(paths.validation_predictions_path)
+        save_checkpoint(checkpoint, context, checkpoint_files)
 
     for name, group, sources in ablation_configs(
         cfg.sources,
@@ -559,6 +581,7 @@ def run_ablation_stage(
     retained = elimination["retained"]
     final_name = elimination["final_config"]
     selection = {
+        "provenance": context,
         "run": _run_info(time.perf_counter() - started),
         "config": cfg.to_dict(),
         "frozen_lightgbm_spec": spec.to_dict(),
@@ -607,6 +630,8 @@ def run_retune_stage(
     selection: dict[str, Any],
     paths: RelationalPaths,
     cfg: AblationConfig | None = None,
+    *,
+    resume: bool = False,
 ) -> dict[str, Any]:
     """Small coordinate search with early stopping on validation, retained sources only."""
     cfg = cfg or AblationConfig()
@@ -625,7 +650,12 @@ def run_retune_stage(
     X_fit_r, X_valid_r = full.loc[X_fit.index, cols], full.loc[X_valid.index, cols]
     del full, X_fit, X_valid
 
-    log = ch.TrialLog(paths.trials_path)
+    context = training_context(X_train, y_train, ids_train, paths, cfg)
+    if selection.get("provenance") != context:
+        raise ValueError("Selection provenance changed; rerun source ablation before retuning.")
+    log = CheckpointTrialLog(
+        paths.trials_path, {**context, "retained": list(retained)}, resume=resume
+    )
     best_spec, best = ch.coordinate_search(
         base,
         cfg.retune_axes,
@@ -716,6 +746,8 @@ def run_final_stage(
     selection: Mapping[str, Any],
     paths: RelationalPaths,
     cfg: AblationConfig | None = None,
+    *,
+    resume: bool = False,
 ) -> dict[str, Any]:
     """Refit the locked configuration on the whole training portion; score the test split once."""
     cfg = cfg or AblationConfig()
@@ -729,6 +761,27 @@ def run_final_stage(
     )
     if "n_estimators" in cfg.param_overrides:
         spec = spec.with_params(n_estimators=cfg.param_overrides["n_estimators"])
+
+    context = training_context(split.X_train, split.y_train, split.ids_train, paths, cfg)
+    if selection.get("provenance") != context:
+        raise ValueError("Selection provenance changed; rerun source ablation before testing.")
+    lock = {"training_context": context, "sources": list(retained), "spec": spec.to_dict()}
+    lock_path = paths.metrics_dir / "relational_experiment_lock.json"
+    checkpoint = paths.final_metrics_path.with_suffix(".checkpoint.json")
+    completed_files = [
+        paths.final_metrics_path,
+        paths.test_predictions_path,
+        paths.model_path,
+        paths.comparison_path,
+        paths.bootstrap_path,
+        paths.importance_path,
+        lock_path,
+    ]
+    if resume and paths.final_metrics_path.exists():
+        validate_checkpoint(checkpoint, lock, completed_files)
+        logger.info("Reusing verified completed frozen-test evaluation; no model refit.")
+        return load_verified_final(paths)
+    write_json(lock_path, {**lock, "locked_at_utc": _run_info(0)["timestamp_utc"]})
 
     X_train = assemble.build_feature_matrix(
         _downcast(split.X_train), split.ids_train, retained, processed_dir=paths.relational_dir
@@ -768,6 +821,7 @@ def run_final_stage(
         p_test,
         figures_dir=paths.figures_dir,
         prefix=MODEL_KEY,
+        label=comparison.LABELS[MODEL_KEY],
         n_bins=cfg.n_calibration_bins,
     )
     paths.models_dir.mkdir(parents=True, exist_ok=True)
@@ -877,6 +931,7 @@ def run_final_stage(
         },
     }
     save_metrics(payload, paths.final_metrics_path)
+    save_checkpoint(checkpoint, lock, completed_files)
     logger.info(
         "Final %s on the frozen test split: ROC-AUC %.4f | PR-AUC %.4f | log loss %.5f | "
         "Brier %.5f | ECE %.4f",
@@ -900,6 +955,33 @@ def run_final_stage(
 # --------------------------------------------------------------------------- #
 # Figures
 # --------------------------------------------------------------------------- #
+def load_verified_final(paths: RelationalPaths) -> dict[str, Any]:
+    """Load completed, checksum-verified outputs for reporting, without model fitting."""
+    lock_path = paths.metrics_dir / "relational_experiment_lock.json"
+    lock = json.loads(lock_path.read_text(encoding="utf-8"))
+    lock.pop("locked_at_utc")
+    files = [
+        paths.final_metrics_path,
+        paths.test_predictions_path,
+        paths.model_path,
+        paths.comparison_path,
+        paths.bootstrap_path,
+        paths.importance_path,
+        lock_path,
+    ]
+    validate_checkpoint(paths.final_metrics_path.with_suffix(".checkpoint.json"), lock, files)
+    frame = pd.read_csv(paths.test_predictions_path)
+    return {
+        "payload": json.loads(paths.final_metrics_path.read_text(encoding="utf-8")),
+        "comparison_table": pd.read_csv(paths.comparison_path),
+        "bootstrap": json.loads(paths.bootstrap_path.read_text(encoding="utf-8")),
+        "predictions": {
+            c.removeprefix("p_"): frame[c].to_numpy() for c in frame if c.startswith("p_")
+        },
+        "importance": pd.read_csv(paths.importance_path),
+    }
+
+
 def plot_ablation(ablation: pd.DataFrame, *, path: str | Path | None = None) -> Figure:
     """Validation ROC-AUC and log loss per configuration, coloured by configuration group."""
     order = ["sequential", "single", "leave-one-out", "elimination"]
@@ -1004,11 +1086,11 @@ def run_experiment(
     if stage in ("all", "retune") and retune:
         selection = selection or json.loads(paths.selection_path.read_text(encoding="utf-8"))
         out["retune"] = run_retune_stage(
-            split.X_train, split.y_train, split.ids_train, selection, paths, cfg
+            split.X_train, split.y_train, split.ids_train, selection, paths, cfg, resume=resume
         )
     if stage in ("all", "final"):
         selection = selection or json.loads(paths.selection_path.read_text(encoding="utf-8"))
-        out["final"] = run_final_stage(split, selection, paths, cfg)
+        out["final"] = run_final_stage(split, selection, paths, cfg, resume=resume)
     return out
 
 
@@ -1020,7 +1102,9 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--stage", choices=["all", "ablation", "retune", "final"], default="all")
     parser.add_argument("--no-retune", action="store_true", help="Skip the light retuning stage.")
     parser.add_argument(
-        "--resume", action="store_true", help="Reuse ablation configurations already recorded."
+        "--resume",
+        action="store_true",
+        help="Reuse content-verified ablation, retuning and final checkpoints.",
     )
     parser.add_argument("--quick", action="store_true", help="Tiny models and search (smoke runs).")
     parser.add_argument("--nrows", type=int, default=None)

@@ -1,5 +1,5 @@
 {
-  "provenance": {
+  "training_context": {
     "training_sha256": "4f1e08da8755fb666391eda481dceba09685c9d4372248201c443688d6c5b3e2",
     "columns": [
       "NAME_CONTRACT_TYPE",
@@ -332,74 +332,25 @@
       "sklearn": "1.9.1"
     }
   },
-  "run": {
-    "timestamp_utc": "2026-09-21T18:13:24+00:00",
-    "riskpilot_version": "0.1.0",
-    "lightgbm_version": "4.7.0",
-    "total_seconds": 106.8
-  },
-  "config": {
-    "valid_size": 0.2,
-    "random_state": 42,
-    "n_jobs": 6,
-    "n_bootstrap_validation": 500,
-    "bootstrap_seed": 42,
-    "n_calibration_bins": 10,
-    "sources": [
-      "bureau",
-      "previous",
-      "installments",
-      "credit_card",
-      "pos"
-    ],
-    "include_single": true,
-    "include_leave_one_out": true,
-    "param_overrides": {},
-    "retune_axes": [
-      [
-        "num_leaves",
-        [
-          15,
-          31
-        ]
-      ],
-      [
-        "min_child_samples",
-        [
-          100,
-          500
-        ]
-      ],
-      [
-        "colsample_bytree",
-        [
-          0.3,
-          0.5
-        ]
-      ],
-      [
-        "reg_lambda",
-        [
-          1.0,
-          10.0
-        ]
-      ]
-    ],
-    "early_stopping_rounds": 100,
-    "n_bootstrap_test": 1000
-  },
-  "frozen_lightgbm_spec": {
+  "sources": [
+    "bureau",
+    "previous",
+    "installments",
+    "credit_card",
+    "pos"
+  ],
+  "spec": {
     "library": "lightgbm",
     "params": {
       "objective": "binary",
       "learning_rate": 0.02,
-      "n_estimators": 1380,
+      "n_estimators": 2625,
       "num_leaves": 15,
       "max_depth": -1,
       "min_child_samples": 500,
       "subsample": 0.8,
       "subsample_freq": 1,
-      "colsample_bytree": 0.5,
+      "colsample_bytree": 0.3,
       "reg_alpha": 0.0,
       "reg_lambda": 1.0,
       "random_state": 42,
@@ -409,270 +360,5 @@
     "heavy_tail": "none",
     "missing_indicators": "none"
   },
-  "validation_split": {
-    "strategy": "stratified holdout inside the frozen training portion (as Milestone 2)",
-    "membership_file": "data/processed/internal_validation_membership.csv",
-    "n_fit": 196806,
-    "n_valid": 49202,
-    "prevalence_fit": 0.08072924605957135,
-    "prevalence_valid": 0.0807284256737531
-  },
-  "full_matrix": {
-    "n_rows": 246008,
-    "n_features": 291,
-    "history_coverage": {
-      "bureau": 0.8567363619804382,
-      "previous": 0.9464489221572876,
-      "installments": 0.9484325647354126,
-      "credit_card": 0.283255010843277,
-      "pos": 0.9412539601325989
-    }
-  },
-  "source_value": {
-    "bureau": {
-      "history_coverage": 0.8567363619804382,
-      "n_features": 49,
-      "single_source_gain_log_loss": 0.002892911013114896,
-      "single_source_gain_roc_auc": 0.010087208959288052,
-      "leave_one_out_cost_log_loss": 0.002126289625193123,
-      "leave_one_out_cost_roc_auc": 0.005913041745457148
-    },
-    "previous": {
-      "history_coverage": 0.9464489221572876,
-      "n_features": 42,
-      "single_source_gain_log_loss": 0.0034098678411245975,
-      "single_source_gain_roc_auc": 0.012074094162119464,
-      "leave_one_out_cost_log_loss": 0.0012397489808604056,
-      "leave_one_out_cost_roc_auc": 0.0037824243505110156
-    },
-    "installments": {
-      "history_coverage": 0.9484325647354126,
-      "n_features": 26,
-      "single_source_gain_log_loss": 0.0034023674416475136,
-      "single_source_gain_roc_auc": 0.012520770531905812,
-      "leave_one_out_cost_log_loss": 0.001764717970651003,
-      "leave_one_out_cost_roc_auc": 0.005885605606702038
-    },
-    "credit_card": {
-      "history_coverage": 0.283255010843277,
-      "n_features": 34,
-      "single_source_gain_log_loss": 0.0013417430385239126,
-      "single_source_gain_roc_auc": 0.005082220469218579,
-      "leave_one_out_cost_log_loss": 0.0007372201397131128,
-      "leave_one_out_cost_roc_auc": 0.002043304903058818
-    },
-    "pos": {
-      "history_coverage": 0.9412539601325989,
-      "n_features": 20,
-      "single_source_gain_log_loss": 0.002707367437431607,
-      "single_source_gain_roc_auc": 0.009007731324667145,
-      "leave_one_out_cost_log_loss": 0.0007452207427242064,
-      "leave_one_out_cost_roc_auc": 0.002022526021749793
-    }
-  },
-  "elimination": {
-    "retained": [
-      "bureau",
-      "previous",
-      "installments",
-      "credit_card",
-      "pos"
-    ],
-    "final_config": "M5_+pos",
-    "rounds": [
-      {
-        "remaining_before": [
-          "bureau",
-          "previous",
-          "installments",
-          "credit_card",
-          "pos"
-        ],
-        "full_config": "M5_+pos",
-        "candidates": [
-          {
-            "source": "bureau",
-            "config": "L-bureau",
-            "removal_cost_log_loss": 0.002126289625193123,
-            "ci_low": 0.0015391858868673718,
-            "ci_high": 0.002685240399547721,
-            "removal_cost_roc_auc": 0.005913041745457148,
-            "roc_auc_ci_low": 0.004092897563438812,
-            "roc_auc_ci_high": 0.007802561458171528,
-            "fraction_worse_without": 1.0
-          },
-          {
-            "source": "previous",
-            "config": "L-previous",
-            "removal_cost_log_loss": 0.0012397489808604334,
-            "ci_low": 0.0007527156848329778,
-            "ci_high": 0.0017386582275860422,
-            "removal_cost_roc_auc": 0.0037824243505110156,
-            "roc_auc_ci_low": 0.002142577702759291,
-            "roc_auc_ci_high": 0.005425825742251056,
-            "fraction_worse_without": 1.0
-          },
-          {
-            "source": "installments",
-            "config": "L-installments",
-            "removal_cost_log_loss": 0.0017647179706510308,
-            "ci_low": 0.0012467108628306342,
-            "ci_high": 0.0023304412847151164,
-            "removal_cost_roc_auc": 0.005885605606702038,
-            "roc_auc_ci_low": 0.004203648719524698,
-            "roc_auc_ci_high": 0.0077052902691198384,
-            "fraction_worse_without": 1.0
-          },
-          {
-            "source": "credit_card",
-            "config": "L-credit_card",
-            "removal_cost_log_loss": 0.0007372201397131128,
-            "ci_low": 0.0002735902442557802,
-            "ci_high": 0.001220879114620122,
-            "removal_cost_roc_auc": 0.002043304903058818,
-            "roc_auc_ci_low": 0.0005491219812678006,
-            "roc_auc_ci_high": 0.00362484787138346,
-            "fraction_worse_without": 0.998
-          },
-          {
-            "source": "pos",
-            "config": "M4_+credit_card",
-            "removal_cost_log_loss": 0.0007452207427242341,
-            "ci_low": 0.00034460729390008437,
-            "ci_high": 0.0011123438507384784,
-            "removal_cost_roc_auc": 0.002022526021749793,
-            "roc_auc_ci_low": 0.0007903177793670929,
-            "roc_auc_ci_high": 0.00317562884764436,
-            "fraction_worse_without": 1.0
-          }
-        ],
-        "weakest": "credit_card",
-        "dropped": false
-      }
-    ]
-  },
-  "retained_sources": [
-    "bureau",
-    "previous",
-    "installments",
-    "credit_card",
-    "pos"
-  ],
-  "retained_config": "M5_+pos",
-  "retained_validation_metrics": {
-    "n_features": 291,
-    "roc_auc": 0.7855725208005897,
-    "pr_auc": 0.2760263730381497,
-    "log_loss": 0.2379466915679798,
-    "brier": 0.0661865676950305,
-    "brier_skill": 0.1081341276701255,
-    "ece": 0.0050944127305795
-  },
-  "application_only_validation_metrics": {
-    "n_features": 120,
-    "roc_auc": 0.7546842934812982,
-    "pr_auc": 0.2379501621202162,
-    "log_loss": 0.2471745094112423,
-    "brier": 0.0680835467506748,
-    "brier_skill": 0.0825722812234384,
-    "ece": 0.0034988812802201
-  },
-  "artifacts": {
-    "ablation": "artifacts/metrics/relational_ablation.csv",
-    "validation_predictions": "data/processed/relational_validation_predictions.parquet"
-  },
-  "retune": {
-    "run": {
-      "timestamp_utc": "2026-09-21T18:13:39+00:00",
-      "riskpilot_version": "0.1.0",
-      "lightgbm_version": "4.7.0",
-      "total_seconds": 14.8
-    },
-    "axes": [
-      [
-        "num_leaves",
-        [
-          15,
-          31
-        ]
-      ],
-      [
-        "min_child_samples",
-        [
-          100,
-          500
-        ]
-      ],
-      [
-        "colsample_bytree",
-        [
-          0.3,
-          0.5
-        ]
-      ],
-      [
-        "reg_lambda",
-        [
-          1.0,
-          10.0
-        ]
-      ]
-    ],
-    "n_trials": 5,
-    "selected_trial": "lightgbm-04",
-    "locked_spec": {
-      "library": "lightgbm",
-      "params": {
-        "objective": "binary",
-        "learning_rate": 0.02,
-        "n_estimators": 2625,
-        "num_leaves": 15,
-        "max_depth": -1,
-        "min_child_samples": 500,
-        "subsample": 0.8,
-        "subsample_freq": 1,
-        "colsample_bytree": 0.3,
-        "reg_alpha": 0.0,
-        "reg_lambda": 1.0,
-        "random_state": 42,
-        "n_jobs": 6,
-        "verbose": 0
-      },
-      "heavy_tail": "none",
-      "missing_indicators": "none"
-    },
-    "changed_vs_frozen": {
-      "colsample_bytree": {
-        "frozen": 0.5,
-        "retuned": 0.3
-      },
-      "n_estimators": {
-        "frozen": 1380,
-        "retuned": 2625
-      }
-    },
-    "validation_metrics": {
-      "roc_auc": 0.7867203800470194,
-      "average_precision": 0.2756628118492085,
-      "log_loss": 0.237696233034954,
-      "brier_score": 0.0661962368037294,
-      "brier_skill_score": 0.1080038361568364,
-      "expected_calibration_error": 0.004942843862111,
-      "calibration_slope": 0.9708879235289124,
-      "calibration_intercept": -0.0400904681158687,
-      "mean_predicted_probability": 0.0794977612256844
-    },
-    "frozen_configuration_validation_metrics": {
-      "n_features": 291,
-      "roc_auc": 0.7855725208005897,
-      "pr_auc": 0.2760263730381497,
-      "log_loss": 0.2379466915679798,
-      "brier": 0.0661865676950305,
-      "brier_skill": 0.1081341276701255,
-      "ece": 0.0050944127305795
-    },
-    "artifacts": {
-      "trials": "artifacts/metrics/relational_trials.csv"
-    }
-  }
+  "locked_at_utc": "2026-09-21T18:03:32+00:00"
 }

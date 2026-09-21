@@ -1,0 +1,72 @@
+{
+  "frozen_membership_unchanged": true,
+  "internal_membership_unchanged": true,
+  "test_rows": 61503,
+  "validation_rows": 49202,
+  "validated_ablation_configurations": 14,
+  "non_bureau_configurations_reproduce_pre_repair_predictions": [
+    "M0_application",
+    "S_previous",
+    "S_installments",
+    "S_credit_card",
+    "S_pos",
+    "L-bureau"
+  ],
+  "persisted_model_max_prediction_difference": 9.974659986866641e-17,
+  "all_test_and_validation_metrics_reproduce": true,
+  "bootstrap_estimates_reproduce": true,
+  "bootstrap_replicates": 1000,
+  "bootstrap_seed": 42,
+  "lock_time_utc": "2026-09-21T18:03:32+00:00",
+  "final_results_time_utc": "2026-09-21T18:09:03+00:00",
+  "feature_count": 291,
+  "reference_integrity": {
+    "logistic_regression": {
+      "model_reloaded_from_disk": true,
+      "model_path": "C:/Users/ricar/riskpilot-ai/artifacts/models/baseline_logistic_regression.joblib",
+      "recorded_metrics_available": true,
+      "split_verified_against_reseeded_split": true,
+      "n_test_matches": true,
+      "max_abs_metric_difference": 2.7755575615628914e-17,
+      "tolerance": 1e-06,
+      "metrics_match_recorded": true,
+      "recorded_test_metrics": {
+        "roc_auc": 0.7504123473248321,
+        "average_precision": 0.23531823859611234,
+        "log_loss": 0.24820499894091355,
+        "brier_score": 0.06821592765037675
+      }
+    },
+    "lightgbm": {
+      "model_reloaded_from_disk": true,
+      "model_path": "C:/Users/ricar/riskpilot-ai/artifacts/models/lightgbm_challenger.joblib",
+      "recorded_metrics_available": true,
+      "split_verified_against_reseeded_split": true,
+      "n_test_matches": true,
+      "max_abs_metric_difference": 0.0,
+      "tolerance": 1e-06,
+      "metrics_match_recorded": true,
+      "recorded_test_metrics": {
+        "roc_auc": 0.7622001575498403,
+        "average_precision": 0.25380570791039625,
+        "log_loss": 0.2445564646536432,
+        "brier_score": 0.06739081387345636
+      }
+    }
+  },
+  "temporal_and_test_access_code_audit": "passed under documented competition-data assumptions",
+  "accepted_ms1_ms2_artifacts_unchanged": 32,
+  "pytest_passed": true,
+  "pytest_count": 154,
+  "pytest_seconds": 54.42,
+  "ruff_passed": true,
+  "format_passed": true,
+  "formatted_source_test_files": 36,
+  "plot_legends_and_axes_verified": true,
+  "cli_resume_verified_without_refitting": true,
+  "resume_preserved_model_metrics_bootstrap_and_trial_bytes": true,
+  "notebook_executed_without_errors": true,
+  "notebook_code_cells": 10,
+  "status": "Milestone 3 ACCEPTED",
+  "accepted_at_utc": "2026-09-21T18:49:55.338676+00:00"
+}

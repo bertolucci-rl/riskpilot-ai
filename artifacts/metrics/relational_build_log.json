@@ -1,18 +1,153 @@
 {
   "sources": {
     "bureau": {
-      "built_at_utc": "2026-09-17T23:03:43+00:00",
+      "cache_provenance": {
+        "created_at_utc": "2026-09-21T17:30:50.210107+00:00",
+        "source": "bureau",
+        "raw_files": {
+          "bureau": {
+            "file": "bureau.csv",
+            "bytes": 170016717,
+            "sha256": "9d799143423f280720cf51c1bfbbab2a0422da8ff2763335bb30bf43155494f7"
+          },
+          "bureau_balance": {
+            "file": "bureau_balance.csv",
+            "bytes": 375592889,
+            "sha256": "33e09f06174c26f0be6b8b7398886c69e7bf0abbb29b4122f7841ffe545729a9"
+          }
+        },
+        "builder": {
+          "format": 2,
+          "temporal_policy": "application-time-v2",
+          "code": {
+            "bureau.py": "3ec096f396556fb45868cbc5b8218a89f65f1cb3642a99dba8495a257801619f",
+            "common.py": "168813b7d2ec3aae82d72da6f97295ad3681cfa938067d0b77254c4c1557aa0e",
+            "temporal.py": "716f81a95536213367bcaaffe800f1dd2bb938b88998a9ea4569f1309faf8568",
+            "provenance.py": "786ff54ada92e22921033e63977fe98cd2ff15711b8058aeab9a38e5cb9d67bb"
+          },
+          "pandas": "2.3.3"
+        },
+        "nrows": null,
+        "schema": {
+          "rows": 305811,
+          "customers": 305811,
+          "columns": [
+            "SK_ID_CURR",
+            "bureau__credit_count",
+            "bureau__active_count",
+            "bureau__closed_count",
+            "bureau__sold_or_bad_count",
+            "bureau__active_ratio",
+            "bureau__n_credit_types",
+            "bureau__consumer_count",
+            "bureau__credit_card_count",
+            "bureau__car_loan_count",
+            "bureau__mortgage_count",
+            "bureau__microloan_count",
+            "bureau__other_type_count",
+            "bureau__credits_last_year",
+            "bureau__credit_sum_total",
+            "bureau__credit_sum_mean",
+            "bureau__credit_sum_max",
+            "bureau__debt_sum_total",
+            "bureau__debt_sum_mean",
+            "bureau__debt_sum_max",
+            "bureau__active_debt_sum",
+            "bureau__limit_sum",
+            "bureau__annuity_sum",
+            "bureau__overdue_sum_total",
+            "bureau__overdue_sum_max",
+            "bureau__max_overdue_max",
+            "bureau__max_overdue_mean",
+            "bureau__day_overdue_max",
+            "bureau__day_overdue_mean",
+            "bureau__overdue_credit_count",
+            "bureau__prolong_sum",
+            "bureau__debt_to_credit_ratio",
+            "bureau__overdue_to_debt_ratio",
+            "bureau__days_credit_max",
+            "bureau__days_credit_min",
+            "bureau__days_credit_mean",
+            "bureau__days_update_max",
+            "bureau__enddate_remaining_max",
+            "bureau__days_enddate_fact_max",
+            "bureau__bb_credits_with_history",
+            "bureau__bb_months_sum",
+            "bureau__bb_history_max",
+            "bureau__bb_dpd_months_sum",
+            "bureau__bb_dpd_share_mean",
+            "bureau__bb_status_max",
+            "bureau__bb_severe_credits",
+            "bureau__bb_latest_dpd_credits",
+            "bureau__bb_recent_dpd_credits",
+            "bureau__bb_closed_share_mean"
+          ],
+          "dtypes": [
+            "int32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32"
+          ]
+        },
+        "sha256": "44d4bece54d0473aca70b889332dfa2ebf8f1d9c659a5bd1a2c161a993cb4b9c"
+      },
+      "built_at_utc": "2026-09-21T17:30:51+00:00",
       "riskpilot_version": "0.1.0",
       "raw_files": {
         "bureau": {
           "file": "bureau.csv",
-          "size_bytes": 170016717,
-          "mtime": 1789685349.8777926
+          "bytes": 170016717,
+          "sha256": "9d799143423f280720cf51c1bfbbab2a0422da8ff2763335bb30bf43155494f7"
         },
         "bureau_balance": {
           "file": "bureau_balance.csv",
-          "size_bytes": 375592889,
-          "mtime": 1789685360.5377836
+          "bytes": 375592889,
+          "sha256": "33e09f06174c26f0be6b8b7398886c69e7bf0abbb29b4122f7841ffe545729a9"
         }
       },
       "nrows": null,
@@ -22,19 +157,135 @@
       },
       "output_customers": 305811,
       "n_features": 48,
-      "seconds": 30.6,
+      "seconds": 42.0,
       "output_memory_mb": 59.9,
       "output_file_mb": 22.1,
       "path": "data/processed/relational/bureau.parquet"
     },
     "previous": {
-      "built_at_utc": "2026-09-17T23:03:58+00:00",
+      "cache_provenance": {
+        "created_at_utc": "2026-09-21T17:31:11.637531+00:00",
+        "source": "previous",
+        "raw_files": {
+          "previous": {
+            "file": "previous_application.csv",
+            "bytes": 404973293,
+            "sha256": "5046cd657ee04df2eaa6dc8308ae86be6b3b1763674a3f63574886a2f2896505"
+          }
+        },
+        "builder": {
+          "format": 2,
+          "temporal_policy": "application-time-v2",
+          "code": {
+            "previous.py": "1b7cde68859c403f58e1fdba48601c7c5c4e88e6a3e335d11bb34caea4a54223",
+            "common.py": "168813b7d2ec3aae82d72da6f97295ad3681cfa938067d0b77254c4c1557aa0e",
+            "temporal.py": "716f81a95536213367bcaaffe800f1dd2bb938b88998a9ea4569f1309faf8568",
+            "provenance.py": "786ff54ada92e22921033e63977fe98cd2ff15711b8058aeab9a38e5cb9d67bb"
+          },
+          "pandas": "2.3.3"
+        },
+        "nrows": null,
+        "schema": {
+          "rows": 338857,
+          "customers": 338857,
+          "columns": [
+            "SK_ID_CURR",
+            "previous__count",
+            "previous__approved_count",
+            "previous__refused_count",
+            "previous__canceled_count",
+            "previous__unused_offer_count",
+            "previous__approval_rate",
+            "previous__refusal_rate",
+            "previous__cancellation_rate",
+            "previous__last_application_refused",
+            "previous__last_application_approved",
+            "previous__decisions_last_year",
+            "previous__days_decision_max",
+            "previous__days_decision_min",
+            "previous__days_decision_mean",
+            "previous__amt_application_mean",
+            "previous__amt_application_max",
+            "previous__amt_credit_approved_mean",
+            "previous__amt_credit_approved_max",
+            "previous__amt_credit_approved_sum",
+            "previous__amt_annuity_approved_mean",
+            "previous__amt_goods_price_mean",
+            "previous__amt_down_payment_mean",
+            "previous__rate_down_payment_mean",
+            "previous__credit_to_application_ratio_mean",
+            "previous__cnt_payment_approved_mean",
+            "previous__cnt_payment_approved_max",
+            "previous__cash_loan_share",
+            "previous__consumer_loan_share",
+            "previous__revolving_loan_share",
+            "previous__portfolio_pos_share",
+            "previous__portfolio_cash_share",
+            "previous__portfolio_cards_share",
+            "previous__x_sell_share",
+            "previous__walk_in_share",
+            "previous__yield_high_share",
+            "previous__yield_low_share",
+            "previous__client_new_share",
+            "previous__insured_rate",
+            "previous__reject_hc_count",
+            "previous__reject_limit_count",
+            "previous__reject_scoring_count"
+          ],
+          "dtypes": [
+            "int32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32"
+          ]
+        },
+        "sha256": "f25729383c517024d983d10b6f37afbdea13a4ed7397d8f584cfbed166981cb4"
+      },
+      "built_at_utc": "2026-09-21T17:31:12+00:00",
       "riskpilot_version": "0.1.0",
       "raw_files": {
         "previous": {
           "file": "previous_application.csv",
-          "size_bytes": 404973293,
-          "mtime": 1789685370.4149158
+          "bytes": 404973293,
+          "sha256": "5046cd657ee04df2eaa6dc8308ae86be6b3b1763674a3f63574886a2f2896505"
         }
       },
       "nrows": null,
@@ -43,19 +294,103 @@
       },
       "output_customers": 338857,
       "n_features": 41,
-      "seconds": 15.3,
+      "seconds": 19.6,
       "output_memory_mb": 56.9,
       "output_file_mb": 24.4,
       "path": "data/processed/relational/previous.parquet"
     },
     "installments": {
-      "built_at_utc": "2026-09-17T23:04:37+00:00",
+      "cache_provenance": {
+        "created_at_utc": "2026-09-21T17:31:47.243648+00:00",
+        "source": "installments",
+        "raw_files": {
+          "installments": {
+            "file": "installments_payments.csv",
+            "bytes": 723118349,
+            "sha256": "428c2e2496e4d6d697ee8270e98497e5213c41be16d882eed1bc95b133726797"
+          }
+        },
+        "builder": {
+          "format": 2,
+          "temporal_policy": "application-time-v2",
+          "code": {
+            "installments.py": "48e615ca75ae81a894e0ce332d0674d67d2a9c00d3826882d1675d41222166f2",
+            "common.py": "168813b7d2ec3aae82d72da6f97295ad3681cfa938067d0b77254c4c1557aa0e",
+            "temporal.py": "716f81a95536213367bcaaffe800f1dd2bb938b88998a9ea4569f1309faf8568",
+            "provenance.py": "786ff54ada92e22921033e63977fe98cd2ff15711b8058aeab9a38e5cb9d67bb"
+          },
+          "pandas": "2.3.3"
+        },
+        "nrows": null,
+        "schema": {
+          "rows": 339587,
+          "customers": 339587,
+          "columns": [
+            "SK_ID_CURR",
+            "installments__n_installments",
+            "installments__n_contracts",
+            "installments__n_split_payments",
+            "installments__days_since_last_instalment",
+            "installments__history_span_days",
+            "installments__late_count",
+            "installments__late_rate",
+            "installments__severe_late_rate",
+            "installments__days_late_mean",
+            "installments__days_late_max",
+            "installments__days_late_min",
+            "installments__days_late_std",
+            "installments__late_days_when_late_mean",
+            "installments__unpaid_rate",
+            "installments__payment_ratio_mean",
+            "installments__payment_ratio_std",
+            "installments__underpaid_rate",
+            "installments__overpaid_rate",
+            "installments__scheduled_sum",
+            "installments__paid_sum",
+            "installments__payment_gap_sum",
+            "installments__paid_share",
+            "installments__n_installments_12m",
+            "installments__late_rate_12m",
+            "installments__underpaid_rate_12m"
+          ],
+          "dtypes": [
+            "int32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32"
+          ]
+        },
+        "sha256": "73df7cac035606bfb25893368200751fce123318ee82e7f645c72a29defbf978"
+      },
+      "built_at_utc": "2026-09-21T17:31:48+00:00",
       "riskpilot_version": "0.1.0",
       "raw_files": {
         "installments": {
           "file": "installments_payments.csv",
-          "size_bytes": 723118349,
-          "mtime": 1789685389.5610254
+          "bytes": 723118349,
+          "sha256": "428c2e2496e4d6d697ee8270e98497e5213c41be16d882eed1bc95b133726797"
         }
       },
       "nrows": null,
@@ -64,19 +399,119 @@
       },
       "output_customers": 339587,
       "n_features": 25,
-      "seconds": 38.8,
+      "seconds": 35.0,
       "output_memory_mb": 35.3,
       "output_file_mb": 15.1,
       "path": "data/processed/relational/installments.parquet"
     },
     "credit_card": {
-      "built_at_utc": "2026-09-17T23:04:50+00:00",
+      "cache_provenance": {
+        "created_at_utc": "2026-09-21T17:32:04.003088+00:00",
+        "source": "credit_card",
+        "raw_files": {
+          "credit_card": {
+            "file": "credit_card_balance.csv",
+            "bytes": 424582605,
+            "sha256": "a9cdc48900d55131c90f3128b991859aeb94ca1326fb5f4d1624b9fd03782247"
+          }
+        },
+        "builder": {
+          "format": 2,
+          "temporal_policy": "application-time-v2",
+          "code": {
+            "credit_card.py": "999f293d9a2edddeceb80323f89a7dae5728c5ce6ab2f79e95e3c9c2d0f63003",
+            "common.py": "168813b7d2ec3aae82d72da6f97295ad3681cfa938067d0b77254c4c1557aa0e",
+            "temporal.py": "716f81a95536213367bcaaffe800f1dd2bb938b88998a9ea4569f1309faf8568",
+            "provenance.py": "786ff54ada92e22921033e63977fe98cd2ff15711b8058aeab9a38e5cb9d67bb"
+          },
+          "pandas": "2.3.3"
+        },
+        "nrows": null,
+        "schema": {
+          "rows": 103558,
+          "customers": 103558,
+          "columns": [
+            "SK_ID_CURR",
+            "credit_card__n_months",
+            "credit_card__n_cards",
+            "credit_card__months_min",
+            "credit_card__months_max",
+            "credit_card__balance_mean",
+            "credit_card__balance_max",
+            "credit_card__balance_std",
+            "credit_card__balance_latest_mean",
+            "credit_card__limit_mean",
+            "credit_card__limit_max",
+            "credit_card__utilization_mean",
+            "credit_card__utilization_max",
+            "credit_card__high_utilization_rate",
+            "credit_card__over_limit_rate",
+            "credit_card__utilization_latest_mean",
+            "credit_card__dpd_mean",
+            "credit_card__dpd_max",
+            "credit_card__dpd_positive_rate",
+            "credit_card__severe_dpd_rate",
+            "credit_card__dpd_def_max",
+            "credit_card__drawings_sum",
+            "credit_card__drawings_mean",
+            "credit_card__atm_drawings_sum",
+            "credit_card__pos_drawings_sum",
+            "credit_card__atm_drawing_month_rate",
+            "credit_card__drawings_count_sum",
+            "credit_card__payment_mean",
+            "credit_card__min_payment_mean",
+            "credit_card__payment_to_min_ratio_mean",
+            "credit_card__missed_min_payment_rate",
+            "credit_card__active_month_share",
+            "credit_card__completed_cards",
+            "credit_card__mature_installments_max"
+          ],
+          "dtypes": [
+            "int32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32"
+          ]
+        },
+        "sha256": "a10e2859c95f8c8fc0c3fcfa415df9cd09c600a52f6fcf5d6ae3e522e23edb55"
+      },
+      "built_at_utc": "2026-09-21T17:32:04+00:00",
       "riskpilot_version": "0.1.0",
       "raw_files": {
         "credit_card": {
           "file": "credit_card_balance.csv",
-          "size_bytes": 424582605,
-          "mtime": 1789685400.9033327
+          "bytes": 424582605,
+          "sha256": "a9cdc48900d55131c90f3128b991859aeb94ca1326fb5f4d1624b9fd03782247"
         }
       },
       "nrows": null,
@@ -85,19 +520,91 @@
       },
       "output_customers": 103558,
       "n_features": 33,
-      "seconds": 12.6,
+      "seconds": 14.3,
       "output_memory_mb": 14.1,
       "output_file_mb": 7.7,
       "path": "data/processed/relational/credit_card.parquet"
     },
     "pos": {
-      "built_at_utc": "2026-09-17T23:05:21+00:00",
+      "cache_provenance": {
+        "created_at_utc": "2026-09-21T17:32:34.018141+00:00",
+        "source": "pos",
+        "raw_files": {
+          "pos": {
+            "file": "POS_CASH_balance.csv",
+            "bytes": 392703158,
+            "sha256": "0e13bc573ffa8fc29b3f00d975e557143193a405d675b0e4694b06fbdffcb0cd"
+          }
+        },
+        "builder": {
+          "format": 2,
+          "temporal_policy": "application-time-v2",
+          "code": {
+            "pos_cash.py": "bcfd22e702e3d804b6713f15d39ca64984d92c166b295ace0b4afda809d7c5c8",
+            "common.py": "168813b7d2ec3aae82d72da6f97295ad3681cfa938067d0b77254c4c1557aa0e",
+            "temporal.py": "716f81a95536213367bcaaffe800f1dd2bb938b88998a9ea4569f1309faf8568",
+            "provenance.py": "786ff54ada92e22921033e63977fe98cd2ff15711b8058aeab9a38e5cb9d67bb"
+          },
+          "pandas": "2.3.3"
+        },
+        "nrows": null,
+        "schema": {
+          "rows": 337252,
+          "customers": 337252,
+          "columns": [
+            "SK_ID_CURR",
+            "pos__n_months",
+            "pos__n_contracts",
+            "pos__months_min",
+            "pos__months_max",
+            "pos__cnt_instalment_mean",
+            "pos__cnt_instalment_max",
+            "pos__instalments_future_mean",
+            "pos__instalments_future_max",
+            "pos__remaining_share_mean",
+            "pos__dpd_mean",
+            "pos__dpd_max",
+            "pos__dpd_positive_rate",
+            "pos__severe_dpd_rate",
+            "pos__dpd_def_max",
+            "pos__dpd_def_positive_rate",
+            "pos__recent_dpd_rate",
+            "pos__active_month_share",
+            "pos__completed_month_share",
+            "pos__completed_contracts"
+          ],
+          "dtypes": [
+            "int32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32",
+            "float32"
+          ]
+        },
+        "sha256": "8986b79d135c17d28533cab6ccdfb230c5995ba4c26922d393f0d26b4e7fe694"
+      },
+      "built_at_utc": "2026-09-21T17:32:34+00:00",
       "riskpilot_version": "0.1.0",
       "raw_files": {
         "pos": {
           "file": "POS_CASH_balance.csv",
-          "size_bytes": 392703158,
-          "mtime": 1789685412.0319464
+          "bytes": 392703158,
+          "sha256": "0e13bc573ffa8fc29b3f00d975e557143193a405d675b0e4694b06fbdffcb0cd"
         }
       },
       "nrows": null,
@@ -106,20 +613,20 @@
       },
       "output_customers": 337252,
       "n_features": 19,
-      "seconds": 31.2,
+      "seconds": 29.0,
       "output_memory_mb": 27.0,
       "output_file_mb": 8.6,
       "path": "data/processed/relational/pos.parquet"
     }
   },
   "last_run": {
-    "at_utc": "2026-09-17T23:05:21+00:00",
+    "at_utc": "2026-09-21T17:33:24+00:00",
     "status": {
-      "bureau": "built",
-      "previous": "built",
-      "installments": "built",
-      "credit_card": "built",
-      "pos": "built"
+      "bureau": "cached",
+      "previous": "cached",
+      "installments": "cached",
+      "credit_card": "cached",
+      "pos": "cached"
     },
     "raw_dir": "data/raw",
     "processed_dir": "data/processed/relational"

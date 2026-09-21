@@ -356,6 +356,7 @@ def make_evaluation_figures(
     *,
     figures_dir: str | Path,
     prefix: str = "baseline",
+    label: str = "Logistic Regression",
     n_bins: int = 10,
     close: bool = True,
 ) -> dict[str, Path]:
@@ -369,9 +370,13 @@ def make_evaluation_figures(
         "probability_distribution": figures_dir / f"{prefix}_probability_distribution.png",
     }
     figs = [
-        plot_roc_curve(y_true, y_prob, path=outputs["roc_curve"]),
-        plot_precision_recall_curve(y_true, y_prob, path=outputs["precision_recall_curve"]),
-        plot_calibration_curve(y_true, y_prob, path=outputs["calibration_curve"], n_bins=n_bins),
+        plot_roc_curve(y_true, y_prob, path=outputs["roc_curve"], label=label),
+        plot_precision_recall_curve(
+            y_true, y_prob, path=outputs["precision_recall_curve"], label=label
+        ),
+        plot_calibration_curve(
+            y_true, y_prob, path=outputs["calibration_curve"], n_bins=n_bins, label=label
+        ),
         plot_probability_distribution(y_true, y_prob, path=outputs["probability_distribution"]),
     ]
     if close:

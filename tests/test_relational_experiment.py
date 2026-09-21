@@ -202,6 +202,14 @@ def relational_setup(synthetic_df, tmp_path):
         for spec in module.SPECS:
             frame[f"{module.PREFIX}__{spec.name}"] = rng.normal(size=len(chosen)).astype("float32")
         frame.to_parquet(processed / f"{source}.parquet", index=False)
+        from riskpilot import config
+        from riskpilot.features.relational.provenance import RAW_FILES, register_cache
+
+        raw = tmp_path / "raw"
+        raw.mkdir(exist_ok=True)
+        for table in RAW_FILES[source]:
+            (raw / config.RELATIONAL_TABLES[table]["filename"]).write_text("synthetic fixture")
+        register_cache(source, processed / f"{source}.parquet", frame, raw_dir=raw)
         tables[source] = frame
     metrics = tmp_path / "metrics"
     metrics.mkdir()
@@ -287,3 +295,75 @@ def test_ablation_stage_never_receives_test_data():
     assert not any("test" in p.lower() for p in params)
     params = list(inspect.signature(rx.run_retune_stage).parameters)
     assert not any("test" in p.lower() for p in params)
+
+
+@pytest.mark.parametrize("change", ["training", "config", "predictions", "membership"])
+def test_ablation_resume_rejects_changed_inputs(synthetic_df, relational_setup, change):
+    paths, _ = relational_setup
+    X, y = split_features_target(synthetic_df)
+    ids = synthetic_df[ID]
+    cfg = rx.AblationConfig(
+        n_jobs=2,
+        n_bootstrap_validation=5,
+        sources=("bureau",),
+        param_overrides={"n_estimators": 3, "min_child_samples": 5},
+    )
+    rx.run_ablation_stage(X, y, ids, paths, cfg)
+    if change == "training":
+        y = 1 - y
+    elif change == "config":
+        cfg.param_overrides["n_estimators"] = 4
+    elif change == "predictions":
+        frame = pd.read_parquet(paths.validation_predictions_path)
+        frame.iloc[0, 0] = 0.999
+        frame.to_parquet(paths.validation_predictions_path)
+    else:
+        frame = pd.read_csv(paths.internal_membership_path)
+        frame.iloc[0, 1] = "tampered"
+        frame.to_csv(paths.internal_membership_path, index=False)
+    with pytest.raises(ValueError, match="resume|membership"):
+        rx.run_ablation_stage(X, y, ids, paths, cfg, resume=True)
+
+
+def test_retune_resume_reuses_trials_and_rejects_corruption(synthetic_df, relational_setup):
+    paths, _ = relational_setup
+    X, y = split_features_target(synthetic_df)
+    ids = synthetic_df[ID]
+    cfg = rx.AblationConfig(
+        n_jobs=2,
+        n_bootstrap_validation=5,
+        sources=("bureau",),
+        param_overrides={"n_estimators": 5, "min_child_samples": 5},
+        retune_axes=[("num_leaves", [3, 7])],
+        early_stopping_rounds=2,
+    )
+    selection = rx.run_ablation_stage(X, y, ids, paths, cfg)
+    first = rx.run_retune_stage(X, y, ids, selection, paths, cfg)
+    original = paths.trials_path.read_bytes()
+    second = rx.run_retune_stage(X, y, ids, selection, paths, cfg, resume=True)
+    assert first["locked_spec"] == second["locked_spec"]
+    assert paths.trials_path.read_bytes() == original
+    paths.trials_path.write_bytes(original + b"\n")
+    with pytest.raises(ValueError, match="Cannot resume"):
+        rx.run_retune_stage(X, y, ids, selection, paths, cfg, resume=True)
+
+
+def test_evaluation_figures_use_actual_model_label(tmp_path):
+    import matplotlib.pyplot as plt
+
+    from riskpilot.models.evaluate import make_evaluation_figures
+
+    plt.close("all")
+    make_evaluation_figures(
+        [0, 0, 1, 1],
+        [0.1, 0.3, 0.6, 0.9],
+        figures_dir=tmp_path,
+        label="Corrected relational LightGBM",
+        close=False,
+        n_bins=2,
+    )
+    for number in plt.get_fignums()[:3]:
+        labels = plt.figure(number).axes[0].get_legend_handles_labels()[1]
+        assert any("Corrected relational LightGBM" in label for label in labels)
+        assert not any("Logistic Regression" in label for label in labels)
+    plt.close("all")

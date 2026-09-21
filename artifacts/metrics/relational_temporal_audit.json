@@ -1,0 +1,144 @@
+{
+  "bureau": {
+    "rows": 1716428,
+    "fields": {
+      "DAYS_CREDIT": {
+        "missing": 0,
+        "positive": 0,
+        "zero": 25,
+        "min": -2922.0,
+        "max": 0.0
+      },
+      "DAYS_CREDIT_UPDATE": {
+        "missing": 0,
+        "positive": 17,
+        "zero": 605,
+        "min": -41947.0,
+        "max": 372.0
+      },
+      "DAYS_ENDDATE_FACT": {
+        "missing": 633653,
+        "positive": 0,
+        "zero": 64,
+        "min": -42023.0,
+        "max": 0.0
+      },
+      "DAYS_CREDIT_ENDDATE": {
+        "missing": 105553,
+        "positive": 602603,
+        "zero": 883,
+        "min": -42060.0,
+        "max": 31199.0
+      }
+    }
+  },
+  "bureau_balance": {
+    "rows": 27299925,
+    "fields": {
+      "MONTHS_BALANCE": {
+        "missing": 0,
+        "positive": 0,
+        "zero": 610965,
+        "min": -96.0,
+        "max": 0.0
+      }
+    }
+  },
+  "previous_application": {
+    "rows": 1670214,
+    "fields": {
+      "DAYS_DECISION": {
+        "missing": 0,
+        "positive": 0,
+        "zero": 0,
+        "min": -2922.0,
+        "max": -1.0
+      },
+      "DAYS_FIRST_DRAWING": {
+        "missing": 673065,
+        "positive": 934444,
+        "zero": 0,
+        "min": -2922.0,
+        "max": 365243.0
+      },
+      "DAYS_FIRST_DUE": {
+        "missing": 673065,
+        "positive": 40645,
+        "zero": 0,
+        "min": -2892.0,
+        "max": 365243.0
+      },
+      "DAYS_LAST_DUE_1ST_VERSION": {
+        "missing": 673065,
+        "positive": 318256,
+        "zero": 705,
+        "min": -2801.0,
+        "max": 365243.0
+      },
+      "DAYS_LAST_DUE": {
+        "missing": 673065,
+        "positive": 211221,
+        "zero": 0,
+        "min": -2889.0,
+        "max": 365243.0
+      },
+      "DAYS_TERMINATION": {
+        "missing": 673065,
+        "positive": 225913,
+        "zero": 0,
+        "min": -2874.0,
+        "max": 365243.0
+      }
+    }
+  },
+  "installments_payments": {
+    "rows": 13605401,
+    "fields": {
+      "DAYS_INSTALMENT": {
+        "missing": 0,
+        "positive": 0,
+        "zero": 0,
+        "min": -2922.0,
+        "max": -1.0
+      },
+      "DAYS_ENTRY_PAYMENT": {
+        "missing": 2905,
+        "positive": 0,
+        "zero": 0,
+        "min": -4921.0,
+        "max": -1.0
+      }
+    },
+    "payment_amount_without_payment_date": 0
+  },
+  "credit_card_balance": {
+    "rows": 3840312,
+    "fields": {
+      "MONTHS_BALANCE": {
+        "missing": 0,
+        "positive": 0,
+        "zero": 0,
+        "min": -96.0,
+        "max": -1.0
+      }
+    }
+  },
+  "POS_CASH_balance": {
+    "rows": 10001358,
+    "fields": {
+      "MONTHS_BALANCE": {
+        "missing": 0,
+        "positive": 0,
+        "zero": 0,
+        "min": -96.0,
+        "max": -1.0
+      }
+    }
+  },
+  "metadata": {
+    "source": "official Kaggle Home Credit column dictionary, preserved locally",
+    "sha256": "eef7665398228a80f7367c9258220c5fbe1038f3f54094244f354d54e2d4fb03",
+    "policy": "application-time-v2",
+    "no_targets_used": true
+  }
+}

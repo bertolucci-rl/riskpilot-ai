@@ -10,8 +10,9 @@ engineering over the relational credit-history tables; statistically controlled
 model comparison on one frozen holdout (paired bootstrap); and probability-focused
 evaluation (proper scores and calibration) throughout.
 
-Milestones 1 and 2 are verified. The relational experiment is recovered work whose
-acceptance review is incomplete; see the [recovery audit](reports/relational_recovery_audit.md).
+Milestones 1-3 are complete. The relational pipeline underwent a temporal-integrity
+audit and correction; see the [technical report](reports/relational_features_report.md)
+and [repair verification](reports/ms3_repair_report.md).
 
 ## Problem
 
@@ -37,7 +38,7 @@ model that rejects nobody is 92% "accurate".
 |---|---|---|
 | 1. Probabilistic baseline (Logistic Regression) | complete | ROC-AUC 0.750, calibrated (ECE 0.002) on a frozen 20 % holdout |
 | 2. Gradient-boosting challengers (LightGBM, XGBoost) | complete | ROC-AUC 0.762, PR-AUC +7.9 %, log loss −1.5 %, calibration preserved |
-| 3. Relational credit-history features (5 sources, 6 tables) | recovered; incomplete | Recorded ROC-AUC **0.790**; temporal acceptance and reporting corrections pending |
+| 3. Relational credit-history features (5 sources, 6 tables) | complete | Corrected ROC-AUC **0.7900**, PR-AUC **0.2948**; temporal audit and paired comparison verified |
 | 4–10. Calibration, decision engine, explainability, API, monitoring, AI analyst | not started | see roadmap |
 
 ## Milestone 1: probabilistic baseline
@@ -256,73 +257,46 @@ per-model figures, `artifacts/metrics/model_comparison.csv`,
 `challenger_trials.csv` (all 33 fits), `challenger_selection.json`,
 `{lightgbm,xgboost}_metrics.json` and `bootstrap_comparison.json`.
 
-## Milestone 3: relational credit-history features (recovered, incomplete)
+## Milestone 3: relational credit-history features - complete
 
-**Acceptance pending.** The following results reproduce the September 17 experiment,
-but are not accepted as a verified replacement for Milestone 2. Seventeen bureau
-records have future-dated updates that the implementation clips to zero; their
-decision-time availability remains unresolved. The [recovery audit](reports/relational_recovery_audit.md)
-documents this blocker, reporting errors, and the independent verification performed.
-The application-only LightGBM remains the accepted primary model.
+Historical credit behavior adds predictive information beyond the application form.
+Five customer-level source groups (bureau/bureau-balance, previous applications,
+installments, credit cards and POS/cash) contribute 171 features to the 120
+application features. Validated one-to-one joins preserve the frozen population.
 
-**Question.** How much predictive information do the historical tables add beyond the
-application form, source by source, and what happens to probability quality? Details,
-the temporal / leakage audit and every number: `reports/relational_features_report.md`
-and `notebooks/04_relational_features.ipynb`.
+Sources were compared cumulatively, individually and by removal on internal
+validation with the locked MS2 LightGBM configuration. All five remain selected;
+the original small retuning protocol then locked the final model before test
+evaluation. A temporal-integrity audit masks bureau snapshot information updated
+after application while retaining defensible historical facts and known contractual
+terms. Content/provenance checks prevent reuse of stale feature or model checkpoints.
 
-**Method.** Each table is aggregated to one row per customer with documented feature
-families (171 features, catalogued in `artifacts/metrics/relational_feature_catalog.csv`),
-joined with validated one-to-one merges, and evaluated with the *frozen* Milestone 2
-LightGBM configuration on the internal validation split: application only, then each
-source added cumulatively, alone, and left out. Sources are retained by backward
-elimination with a validation bootstrap; a small retune follows; the frozen test split
-is scored after selection, and the notebook repeats the locked fit for reproducibility.
-The five ambiguous schedule columns of `previous_application` are excluded, but
-positive bureau update dates were clipped rather than independently justified.
-No class weights, no threshold, no recalibration.
+| Model | Features | ROC-AUC | PR-AUC | Log loss | Brier | Brier skill | ECE |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Logistic Regression (MS1) | 312 after preprocessing | 0.7504 | 0.2353 | 0.2482 | 0.0682 | 0.081 | 0.0021 |
+| Application-only LightGBM (MS2) | 120 | 0.7622 | 0.2538 | 0.2446 | 0.0674 | 0.092 | 0.0022 |
+| **Corrected relational LightGBM (MS3)** | 291 | **0.7900** | **0.2948** | **0.2353** | **0.0653** | **0.120** | 0.0021 |
 
-**Internal validation** (49,202 rows, frozen configuration, cumulative sequence):
+Compared with application-only LightGBM, ROC-AUC changes by
+**+0.0278** (95% paired interval
+[+0.0239, +0.0315]); log loss changes by
+**-0.0092**
+([-0.0105, -0.0080]).
+The comparison uses 1,000 paired bootstrap resamples of the same frozen test rows.
+Calibration slope is 1.002; mean prediction is
+0.0802 versus observed prevalence 0.0807.
+These diagnostics do not presently justify formal recalibration.
 
-| Configuration | Features | ROC-AUC | PR-AUC | Log loss | Brier skill |
-|---|---:|---:|---:|---:|---:|
-| application only | 120 | 0.7547 | 0.2380 | 0.2472 | 0.083 |
-| + bureau / bureau_balance | 169 | 0.7646 | 0.2505 | 0.2444 | 0.090 |
-| + previous applications | 211 | 0.7741 | 0.2643 | 0.2415 | 0.099 |
-| + installment payments | 237 | 0.7818 | 0.2726 | 0.2391 | 0.105 |
-| + credit-card balances | 271 | 0.7836 | 0.2736 | 0.2386 | 0.106 |
-| + POS / cash balances | 291 | 0.7855 | 0.2760 | 0.2380 | 0.108 |
+The final model uses 2,625 trees and fits in 154.0s
+on this machine. No threshold policy, recalibration or explainability system is
+implemented. Source details, computational costs, limitations and the historical
+repair comparison belong in the [technical report](reports/relational_features_report.md),
+[repair report](reports/ms3_repair_report.md) and executed
+[notebook](notebooks/04_relational_features.ipynb).
 
-All five sources survived leave-one-out elimination (the weakest, POS, still costs a
-reliable +0.0007 log loss when removed). Standalone, previous applications and
-installment payments are the most informative; conditional on the others, the external
-bureau history is the hardest to replace.
-
-**Frozen test split** (61,503 applications), differences with 95 % paired-bootstrap
-intervals (1,000 resamples, seed 42):
-
-| Model | Feature set | ROC-AUC | PR-AUC | Log loss | Brier | Brier skill | ECE | Slope |
-|---|---|---:|---:|---:|---:|---:|---:|---:|
-| Logistic Regression (Milestone 1) | application (312 after preprocessing) | 0.7504 | 0.2353 | 0.2482 | 0.0682 | 0.081 | 0.0021 | 1.006 |
-| LightGBM (Milestone 2) | application (120) | 0.7622 | 0.2538 | 0.2446 | 0.0674 | 0.092 | 0.0022 | 1.022 |
-| **LightGBM + history** (Milestone 3) | application + 5 sources (291) | **0.7900** | **0.2943** | **0.2354** | **0.0653** | **0.120** | 0.0023 | 1.001 |
-
-| Δ LightGBM + history − | Δ ROC-AUC | Δ PR-AUC | Δ Log loss | Δ Brier |
-|---|---:|---:|---:|---:|
-| application-only LightGBM | +0.0278 [+0.0238, +0.0316] | +0.0405 [+0.0332, +0.0482] | −0.0092 [−0.0105, −0.0080] | −0.0021 [−0.0024, −0.0017] |
-| Logistic Regression | +0.0396 [+0.0353, +0.0441] | +0.0590 [+0.0505, +0.0686] | −0.0129 [−0.0143, −0.0115] | −0.0029 [−0.0033, −0.0025] |
-
-**What it means.** Better information beat better modelling: the historical tables
-are worth about 2.4 × what the change of model class was worth in Milestone 2, both
-proper scores improve with discrimination, and calibration is preserved (mean prediction
-0.080 vs prevalence 0.081, slope 1.00, ECE 0.0023). These are descriptive diagnostics;
-no recalibration comparison was performed, and temporal acceptance remains pending.
-The recorded cost is a 102 s fit (2,635 rounds, 291 features) instead of 37 s and a 4.9 MB
-pipeline instead of 2.6 MB. The whole feature build takes about two minutes and runs
-one table at a time in well under 1 GB.
-
-| Source ablation (validation) | Differences on the frozen test split |
+| Source ablation (validation) | Paired differences (frozen test) |
 |---|---|
-| ![Ablation](artifacts/figures/relational_ablation_validation.png) | ![Deltas](artifacts/figures/relational_delta_bootstrap.png) |
+| ![Ablation](artifacts/figures/relational_ablation_validation.png) | ![Differences](artifacts/figures/relational_delta_bootstrap.png) |
 
 ## Architecture
 
@@ -389,8 +363,8 @@ python -m riskpilot.features.relational.build
 python -m riskpilot.models.relational_experiment  # --stage ablation|retune|final, --resume
 
 # Notebooks, executed in place: 01 audits the data, 02 re-runs the baseline,
-# 03 analyses the challenger selection, 04 the relational ablation; 03 and 04 re-run
-# their frozen-test stage and check it against the command-line run
+# 03 analyses challenger selection and re-runs its final stage.
+# 04 validates and reads the completed relational CLI artifacts without refitting.
 jupyter nbconvert --to notebook --execute --inplace notebooks/01_data_understanding.ipynb
 jupyter nbconvert --to notebook --execute --inplace notebooks/02_baseline.ipynb
 jupyter nbconvert --to notebook --execute --inplace notebooks/03_gradient_boosting.ipynb
@@ -399,6 +373,7 @@ jupyter nbconvert --to notebook --execute --inplace notebooks/04_relational_feat
 # Quality checks
 pytest
 ruff check src tests
+ruff format --check src tests
 ```
 
 On macOS/Linux replace the activation line with `source .venv/bin/activate`.
@@ -406,8 +381,8 @@ On macOS/Linux replace the activation line with `source .venv/bin/activate`.
 ## Roadmap
 
 1. ~~Challenger models (gradient boosting) against the same split and metrics.~~ Done (Milestone 2).
-2. Feature engineering across the relational tables (bureau, previous applications, installments): recovered implementation; acceptance review and corrections pending (Milestone 3).
-3. Probability calibration (Platt / isotonic) with proper held-out comparison.
+2. ~~Feature engineering across the relational tables.~~ Complete after temporal-integrity repair and rerun (Milestone 3).
+3. Probability calibration review; current diagnostics do not justify implementing recalibration.
 4. Cost-sensitive Decision Engine (expected-loss thresholds, approve/review/decline).
 5. Explainability (global and per-decision).
 6. FastAPI scoring service.
@@ -416,7 +391,7 @@ On macOS/Linux replace the activation line with `source .venv/bin/activate`.
 9. RAG over credit policies.
 10. AI evaluation harness for the analyst.
 
-Item 1 is complete; item 2 is recovered but incomplete. Items 3–10 are not implemented
+Items 1 and 2 are complete. Items 3–10 are not implemented
 yet (no SHAP, formal calibration, decision engine, API, monitoring, RAG or agents exist
 in this repository).
 

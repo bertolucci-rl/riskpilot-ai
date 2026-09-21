@@ -1,5 +1,10 @@
 # Recovered relational-feature experiment: acceptance review
 
+> Historical record of the incomplete recovered experiment. The subsequent
+> [MS3 repair report](ms3_repair_report.md) resolves these findings and records
+> acceptance of the corrected rerun. The original findings and recovery evidence
+> below are retained for provenance; they do not describe the current implementation.
+
 This is existing, uncommitted work produced on 2026-09-17, not a new experiment
 started during the Git-authorship cleanup. The original Milestone 3 request is
 present in the local project session log at 2026-09-17 19:43:59 (America/Sao_Paulo).

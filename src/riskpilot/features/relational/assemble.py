@@ -66,7 +66,9 @@ def load_source_table(
             f"{path} not found. Build it with 'python -m riskpilot.features.relational.build "
             f"--sources {source}'."
         )
-    return pd.read_parquet(path)
+    from riskpilot.features.relational.provenance import validated_cache
+
+    return validated_cache(source, path)
 
 
 def has_column(source: str) -> str:
@@ -103,7 +105,34 @@ def feature_catalog(sources: Sequence[str] | None = None) -> pd.DataFrame:
                 ]
             )
         )
-    return pd.concat(frames, ignore_index=True)
+    catalog = pd.concat(frames, ignore_index=True)
+    catalog["temporal_interpretation"] = catalog["leakage_assessment"]
+    bureau_rows = catalog["source"].eq("bureau")
+    snapshot = (
+        "Snapshot known by application: missing/future update or future realized closure "
+        "masks amounts, status and revised terms; positive planned maturity is allowed."
+    )
+    catalog.loc[bureau_rows, "temporal_interpretation"] = snapshot
+    historical = bureau_rows & (
+        catalog["family"].eq("credit types")
+        | catalog["feature"].isin(
+            [
+                "bureau__credit_count",
+                "bureau__n_credit_types",
+                "bureau__credits_last_year",
+                "bureau__days_credit_max",
+                "bureau__days_credit_min",
+                "bureau__days_credit_mean",
+                "bureau__has_history",
+            ]
+        )
+    )
+    catalog.loc[historical, "temporal_interpretation"] = (
+        "Dated origination <= 0 establishes credit existence/type; unknown/future origin excluded."
+    )
+    monthly = bureau_rows & catalog["family"].eq("monthly history")
+    catalog.loc[monthly, "temporal_interpretation"] = "Independent monthly observation <= month 0."
+    return catalog
 
 
 def feature_source(column: str) -> str:

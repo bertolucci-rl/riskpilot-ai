@@ -1,7 +1,7 @@
 source,n_features,gain,split,gain_share,split_share,features_used,top_features_by_gain
-application,120,422546.02853536606,14786,0.5334778562510574,0.40081322851721335,103,"EXT_SOURCE_2, EXT_SOURCE_3, ORGANIZATION_TYPE"
-bureau,49,109076.16947340965,6869,0.13771214762199868,0.1862022228246137,46,"bureau__debt_to_credit_ratio, bureau__days_credit_max, bureau__days_credit_mean"
-previous,42,93246.09136843681,5719,0.11772616843530546,0.15502846299810247,41,"previous__credit_to_application_ratio_mean, previous__refusal_rate, previous__amt_annuity_approved_mean"
-installments,26,75627.10258054733,4130,0.09548163237741185,0.11195445920303605,25,"installments__late_rate_12m, installments__late_rate, installments__paid_sum"
-credit_card,34,45396.51323270798,2469,0.05731454782477223,0.06692870696665763,32,"credit_card__utilization_latest_mean, credit_card__over_limit_rate, credit_card__atm_drawing_month_rate"
-pos,20,46167.26574635506,2917,0.058287647489454426,0.0790729194903768,19,"pos__remaining_share_mean, pos__instalments_future_mean, pos__instalments_future_max"
+application,120,422228.48726272583,14736,0.5334779515026749,0.4009795918367347,103,"EXT_SOURCE_2, EXT_SOURCE_3, ORGANIZATION_TYPE"
+bureau,49,108725.11567401886,6804,0.13737219002605033,0.18514285714285714,46,"bureau__debt_to_credit_ratio, bureau__days_credit_max, bureau__days_credit_mean"
+previous,42,93009.37388324738,5712,0.11751563844366286,0.15542857142857142,41,"previous__credit_to_application_ratio_mean, previous__refusal_rate, previous__amt_annuity_approved_mean"
+installments,26,76423.25386476517,4176,0.0965593799301731,0.11363265306122448,25,"installments__late_rate_12m, installments__late_rate, installments__paid_sum"
+credit_card,34,45508.682846069336,2466,0.0574993863102359,0.06710204081632654,32,"credit_card__utilization_latest_mean, credit_card__over_limit_rate, credit_card__atm_drawing_month_rate"
+pos,20,45568.88750052452,2856,0.05757545378720292,0.07771428571428571,19,"pos__remaining_share_mean, pos__instalments_future_mean, pos__n_months"

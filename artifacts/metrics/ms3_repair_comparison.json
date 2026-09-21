@@ -1,0 +1,205 @@
+{
+  "pre_repair": {
+    "git_commit": "76c2970e5d5bbacc0f8af5ff4d1c0dd7f6a9e6cd",
+    "run": {
+      "timestamp_utc": "2026-09-17T23:46:49+00:00",
+      "riskpilot_version": "0.1.0",
+      "lightgbm_version": "4.7.0",
+      "total_seconds": 210.8
+    },
+    "metrics_test": {
+      "n": 61503,
+      "n_positive": 4965,
+      "prevalence": 0.08072776937710356,
+      "roc_auc": 0.7900037251812958,
+      "average_precision": 0.29430722660736136,
+      "average_precision_prevalence_baseline": 0.08072776937710356,
+      "log_loss": 0.23535181801644292,
+      "log_loss_prevalence_baseline": 0.2805432489119303,
+      "brier_score": 0.06531596490502936,
+      "brier_prevalence_baseline": 0.07421079662850075,
+      "brier_skill_score": 0.11985899798379629,
+      "expected_calibration_error": 0.002321789279559197,
+      "calibration_slope": 1.0009650250444901,
+      "calibration_intercept": 0.0112540540874094,
+      "mean_predicted_probability": 0.08012466867928013,
+      "median_predicted_probability": 0.04583985830122887,
+      "max_predicted_probability": 0.8619633866665402
+    },
+    "n_features": 291,
+    "retained_sources": [
+      "bureau",
+      "previous",
+      "installments",
+      "credit_card",
+      "pos"
+    ],
+    "spec": {
+      "library": "lightgbm",
+      "params": {
+        "objective": "binary",
+        "learning_rate": 0.02,
+        "n_estimators": 2635,
+        "num_leaves": 15,
+        "max_depth": -1,
+        "min_child_samples": 500,
+        "subsample": 0.8,
+        "subsample_freq": 1,
+        "colsample_bytree": 0.3,
+        "reg_alpha": 0.0,
+        "reg_lambda": 1.0,
+        "random_state": 42,
+        "n_jobs": 6,
+        "verbose": 0
+      },
+      "heavy_tail": "none",
+      "missing_indicators": "none"
+    }
+  },
+  "repair_status": "verified; acceptance checklist in reports/ms3_repair_report.md",
+  "frozen_membership_sha256": "ed812798473787e53b7e91574f600aeb36286153fdb16e866ad3449bb71277cf",
+  "internal_membership_sha256": "c18302848bf870b5e176bc2b3930beef2da5556f69b846415446f7891af93360",
+  "feature_repair": {
+    "bureau": {
+      "changed_customers": 17,
+      "changed_cells": 213,
+      "changed_features": {
+        "bureau__active_count": 17,
+        "bureau__closed_count": 1,
+        "bureau__sold_or_bad_count": 1,
+        "bureau__active_ratio": 17,
+        "bureau__credit_sum_total": 17,
+        "bureau__credit_sum_mean": 17,
+        "bureau__credit_sum_max": 13,
+        "bureau__debt_sum_total": 17,
+        "bureau__debt_sum_mean": 17,
+        "bureau__debt_sum_max": 15,
+        "bureau__active_debt_sum": 17,
+        "bureau__limit_sum": 1,
+        "bureau__annuity_sum": 3,
+        "bureau__overdue_sum_total": 1,
+        "bureau__overdue_sum_max": 1,
+        "bureau__day_overdue_max": 1,
+        "bureau__day_overdue_mean": 1,
+        "bureau__overdue_credit_count": 1,
+        "bureau__prolong_sum": 1,
+        "bureau__debt_to_credit_ratio": 17,
+        "bureau__overdue_to_debt_ratio": 7,
+        "bureau__days_update_max": 17,
+        "bureau__enddate_remaining_max": 13
+      }
+    },
+    "previous": {
+      "changed_customers": 0,
+      "changed_cells": 0,
+      "changed_features": {}
+    },
+    "installments": {
+      "changed_customers": 0,
+      "changed_cells": 0,
+      "changed_features": {}
+    },
+    "credit_card": {
+      "changed_customers": 0,
+      "changed_cells": 0,
+      "changed_features": {}
+    },
+    "pos": {
+      "changed_customers": 0,
+      "changed_cells": 0,
+      "changed_features": {}
+    }
+  },
+  "affected_credit_records": 17,
+  "temporal_policy": "application-time-v2",
+  "resource_observations": {
+    "build_sampled_peak_working_set_mib": 1682,
+    "ablation_sampled_peak_working_set_mib": 1837,
+    "full_training_matrix_mb": 323,
+    "note": "Sampled process high-water marks, not a complete system-wide peak trace; six model threads and serial fits."
+  },
+  "execution": {
+    "fresh_ablation": {
+      "timestamp_utc": "2026-09-21T17:50:48+00:00",
+      "riskpilot_version": "0.1.0",
+      "lightgbm_version": "4.7.0",
+      "total_seconds": 1053.2
+    },
+    "fresh_retune": {
+      "timestamp_utc": "2026-09-21T18:02:11+00:00",
+      "riskpilot_version": "0.1.0",
+      "lightgbm_version": "4.7.0",
+      "total_seconds": 657.0
+    }
+  },
+  "evaluation_inputs": {
+    "data/raw/application_train.csv": "52e96b895b1112e1c853f670e58372719c8441c5ed1c57ac2f7fad559d784f5f",
+    "artifacts/models/lightgbm_challenger.joblib": "f8fb88445aafbc672f324b87a38d249fd16a370cbf3d779023a49d5dfb03a754",
+    "artifacts/models/baseline_logistic_regression.joblib": "5b0daee03d2dec14b74eaabfc97e6edd8dc58137250dca7164ae0cf7582dc29a",
+    "artifacts/metrics/baseline_metrics.json": "77ae42df4b2dede7a4c65925efb7f25b4127274e86d55752a92475b47dbc3c8a",
+    "artifacts/metrics/lightgbm_metrics.json": "4a3706c07ee548695f33f493d771aca5afc9932714c696c8fac0f5d2aba4cf08"
+  },
+  "corrected": {
+    "run": {
+      "timestamp_utc": "2026-09-21T18:09:03+00:00",
+      "riskpilot_version": "0.1.0",
+      "lightgbm_version": "4.7.0",
+      "total_seconds": 337.7
+    },
+    "metrics_test": {
+      "n": 61503,
+      "n_positive": 4965,
+      "prevalence": 0.08072776937710356,
+      "roc_auc": 0.7899810399422296,
+      "average_precision": 0.29483454853746416,
+      "average_precision_prevalence_baseline": 0.08072776937710356,
+      "log_loss": 0.23532469484284183,
+      "log_loss_prevalence_baseline": 0.2805432489119303,
+      "brier_score": 0.06530621104827788,
+      "brier_prevalence_baseline": 0.07421079662850075,
+      "brier_skill_score": 0.11999043245417806,
+      "expected_calibration_error": 0.002095607187655574,
+      "calibration_slope": 1.0016524009447012,
+      "calibration_intercept": 0.011741390172654237,
+      "mean_predicted_probability": 0.08016318869308839,
+      "median_predicted_probability": 0.045684081410438164,
+      "max_predicted_probability": 0.8915511432300003
+    },
+    "n_features": 291,
+    "retained_sources": [
+      "bureau",
+      "previous",
+      "installments",
+      "credit_card",
+      "pos"
+    ],
+    "spec": {
+      "library": "lightgbm",
+      "params": {
+        "objective": "binary",
+        "learning_rate": 0.02,
+        "n_estimators": 2625,
+        "num_leaves": 15,
+        "max_depth": -1,
+        "min_child_samples": 500,
+        "subsample": 0.8,
+        "subsample_freq": 1,
+        "colsample_bytree": 0.3,
+        "reg_alpha": 0.0,
+        "reg_lambda": 1.0,
+        "random_state": 42,
+        "n_jobs": 6,
+        "verbose": 0
+      },
+      "heavy_tail": "none",
+      "missing_indicators": "none"
+    }
+  },
+  "corrected_minus_recovered": {
+    "roc_auc": -2.2685239066233542e-05,
+    "average_precision": 0.0005273219301027976,
+    "log_loss": -2.712317360109573e-05,
+    "brier_score": -9.753856751476553e-06,
+    "expected_calibration_error": -0.00022618209190362285
+  }
+}
