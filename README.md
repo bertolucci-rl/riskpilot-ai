@@ -21,11 +21,11 @@ applicant will repay. The statistical object of interest is the **probability of
 default**
 
 ```
-$P(Y = 1 | X = x)$
+P(Y = 1 | X = x)
 ```
 
-where `$Y = 1$` means the client had payment difficulties (the Home Credit
-`TARGET` definition) and `$x$` is what is known at application time. Everything
+where `Y = 1` means the client had payment difficulties (the Home Credit
+`TARGET` definition) and `x` is what is known at application time. Everything
 downstream (pricing, approval thresholds, expected-loss estimates, portfolio
 monitoring) consumes that probability, so the model is judged on **probability
 quality** (log loss, Brier score, calibration) and **ranking quality** (ROC-AUC,
